@@ -12,6 +12,8 @@ export default function Services() {
     category: 'General', 
     durationMin: 30, 
     price: 0, 
+    modality: 'PRESENCIAL',
+    instructions: '',
     costMaterials: '', 
     costEquipment: '', 
     active: true,
@@ -42,7 +44,7 @@ export default function Services() {
 
   const handleSave = async () => {
     if (!form.name || !form.name.trim()) {
-      alert('Por favor, ingresa el nombre de la atención o servicio (ej: Consulta General).')
+      alert('Por favor, ingresa el nombre de la atención, clase o encargo (ej: Asesoría de Portafolio, Timbre Automático).')
       return
     }
     if (Number(form.price) < 0) {
@@ -69,6 +71,8 @@ export default function Services() {
         category: 'General', 
         durationMin: 30, 
         price: 0, 
+        modality: 'PRESENCIAL',
+        instructions: '',
         costMaterials: '', 
         costEquipment: '', 
         active: true,
@@ -98,6 +102,8 @@ export default function Services() {
       category: s.category,
       durationMin: s.durationMin,
       price: s.price,
+      modality: s.modality || 'PRESENCIAL',
+      instructions: s.instructions || '',
       costMaterials: s.costMaterials || '',
       costEquipment: s.costEquipment || '',
       active: s.active,
@@ -114,7 +120,7 @@ export default function Services() {
     <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16, overflowY: 'auto', height: '100%', paddingBottom: 60 }}>
       
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2 style={{ fontSize: 20, fontWeight: 800 }}>Servicios & Consultas</h2>
+        <h2 style={{ fontSize: 20, fontWeight: 800 }}>Servicios, Clases & Encargos</h2>
         <button 
           onClick={() => {
             setForm({ 
@@ -122,6 +128,8 @@ export default function Services() {
               category: 'General', 
               durationMin: 30, 
               price: 0, 
+              modality: 'PRESENCIAL',
+              instructions: '',
               costMaterials: '', 
               costEquipment: '', 
               active: true,
@@ -150,17 +158,31 @@ export default function Services() {
                 {items.map(s => (
                   <div key={s.id} style={{ background: 'var(--card)', padding: 16, borderRadius: 14, border: '0.5px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ cursor: 'pointer', flex: 1 }} onClick={() => handleEdit(s)}>
-                      <div style={{ fontWeight: 700, fontSize: 15 }}>{s.name}</div>
-                      <div style={{ fontSize: 12, color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
-                        <span>{s.durationMin} min</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                        <span style={{ fontWeight: 700, fontSize: 15 }}>{s.name}</span>
+                        <span style={{ 
+                          background: s.modality === 'ONLINE' ? 'rgba(59, 130, 246, 0.12)' : s.modality === 'ENCARGO' ? 'rgba(168, 85, 247, 0.12)' : 'rgba(34, 197, 94, 0.12)',
+                          color: s.modality === 'ONLINE' ? '#3b82f6' : s.modality === 'ENCARGO' ? '#a855f7' : '#22c55e',
+                          padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 800
+                        }}>
+                          {s.modality === 'ONLINE' ? '💻 Online' : s.modality === 'ENCARGO' ? '📦 Encargo' : '🏢 Presencial'}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: 12, color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
+                        <span>⏱️ {s.durationMin} min</span>
                         <span>·</span>
-                        <span>${s.price.toLocaleString('es-CL')}</span>
+                        <span style={{ fontWeight: 700 }}>${s.price.toLocaleString('es-CL')}</span>
                         {s.depositRequired && (
                           <span style={{ background: 'rgba(245, 160, 32, 0.1)', color: 'var(--orange)', padding: '2px 6px', borderRadius: 6, fontSize: 10, fontWeight: 800 }}>
                             ⚡ Seña: ${s.depositAmount.toLocaleString('es-CL')}
                           </span>
                         )}
                       </div>
+                      {s.instructions && (
+                        <div style={{ fontSize: 11, color: 'var(--accent)', marginTop: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
+                          <span>ℹ️</span> <span>{s.instructions}</span>
+                        </div>
+                      )}
                     </div>
                     <div style={{ display: 'flex', gap: 8 }}>
                       <button 
@@ -200,27 +222,121 @@ export default function Services() {
             maxHeight: '90%',
             overflowY: 'auto'
           }}>
-            <h3 style={{ marginBottom: 16, fontWeight: 800 }}>{editingId ? 'Editar Servicio' : 'Nuevo Servicio'}</h3>
+            <h3 style={{ marginBottom: 16, fontWeight: 800 }}>{editingId ? 'Editar Servicio / Encargo' : 'Nuevo Servicio / Encargo'}</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              
+              {/* MODALITY SELECTOR */}
               <div>
-                <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', display: 'block', marginBottom: 4 }}>NOMBRE DE LA ATENCIÓN / SERVICIO</label>
+                <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', display: 'block', marginBottom: 6 }}>MODALIDAD DE ATENCIÓN O ENTREGA</label>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, modality: 'PRESENCIAL' })}
+                    style={{
+                      padding: '10px 4px',
+                      borderRadius: 10,
+                      border: form.modality === 'PRESENCIAL' ? '2px solid var(--accent)' : '1px solid var(--border)',
+                      background: form.modality === 'PRESENCIAL' ? 'rgba(34, 197, 94, 0.12)' : 'var(--bg)',
+                      color: form.modality === 'PRESENCIAL' ? 'var(--green)' : 'var(--muted)',
+                      fontWeight: 800,
+                      fontSize: 12,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: 4
+                    }}
+                  >
+                    <span>🏢 Presencial</span>
+                    <span style={{ fontSize: 9, opacity: 0.8, fontWeight: 600 }}>En el local</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, modality: 'ONLINE' })}
+                    style={{
+                      padding: '10px 4px',
+                      borderRadius: 10,
+                      border: form.modality === 'ONLINE' ? '2px solid var(--accent)' : '1px solid var(--border)',
+                      background: form.modality === 'ONLINE' ? 'rgba(59, 130, 246, 0.12)' : 'var(--bg)',
+                      color: form.modality === 'ONLINE' ? '#3b82f6' : 'var(--muted)',
+                      fontWeight: 800,
+                      fontSize: 12,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: 4
+                    }}
+                  >
+                    <span>💻 Online</span>
+                    <span style={{ fontSize: 9, opacity: 0.8, fontWeight: 600 }}>Meet / Zoom</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, modality: 'ENCARGO' })}
+                    style={{
+                      padding: '10px 4px',
+                      borderRadius: 10,
+                      border: form.modality === 'ENCARGO' ? '2px solid var(--accent)' : '1px solid var(--border)',
+                      background: form.modality === 'ENCARGO' ? 'rgba(168, 85, 247, 0.12)' : 'var(--bg)',
+                      color: form.modality === 'ENCARGO' ? '#a855f7' : 'var(--muted)',
+                      fontWeight: 800,
+                      fontSize: 12,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: 4
+                    }}
+                  >
+                    <span>📦 Encargo</span>
+                    <span style={{ fontSize: 9, opacity: 0.8, fontWeight: 600 }}>Retiro / Entrega</span>
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', display: 'block', marginBottom: 4 }}>
+                  {form.modality === 'ENCARGO' ? 'NOMBRE DEL PRODUCTO / ENCARGO' : 'NOMBRE DE LA ATENCIÓN / CLASE'}
+                </label>
                 <input 
-                  placeholder="Ej: Consulta Médica, Sesión Terapéutica o Asesoría" 
+                  placeholder={form.modality === 'ENCARGO' ? 'Ej: Timbre Automático Personalizado, Sello de Bolsillo...' : 'Ej: Asesoría de Portafolio Docente, Clase Particular...'} 
                   style={{ width: '100%', padding: 14, borderRadius: 12, border: '1px solid var(--border)', background: 'var(--bg)' }}
                   value={form.name} onChange={e => setForm({ ...form, name: e.target.value })}
                 />
               </div>
+
               <div>
-                <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', display: 'block', marginBottom: 4 }}>CATEGORÍA / ESPECIALIDAD</label>
+                <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', display: 'block', marginBottom: 4 }}>CATEGORÍA / ÁREA</label>
                 <input 
-                  placeholder="Ej: Salud, Psicología, Asesoría Legal, Diagnóstico..." 
+                  placeholder="Ej: Clases, Asesorías, Timbres & Sellos, Papelería..." 
                   style={{ width: '100%', padding: 14, borderRadius: 12, border: '1px solid var(--border)', background: 'var(--bg)' }}
                   value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}
                 />
               </div>
+
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', display: 'block', marginBottom: 4 }}>INSTRUCCIONES O NOTA PARA EL CLIENTE (OPCIONAL)</label>
+                <input 
+                  placeholder={
+                    form.modality === 'ENCARGO' 
+                      ? 'Ej: Al reservar, detalla texto y dibujo deseado. Fabricación demora 24-48 hrs hábiles.'
+                      : form.modality === 'ONLINE'
+                      ? 'Ej: Se enviará el enlace Meet/Zoom al correo o WhatsApp 15 min antes.'
+                      : 'Ej: Traer materiales o documentos requeridos para la sesión.'
+                  }
+                  style={{ width: '100%', padding: 14, borderRadius: 12, border: '1px solid var(--border)', background: 'var(--bg)', fontSize: 13 }}
+                  value={form.instructions} onChange={e => setForm({ ...form, instructions: e.target.value })}
+                />
+              </div>
+
               <div style={{ display: 'flex', gap: 10 }}>
                 <div style={{ flex: 1 }}>
-                  <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', display: 'block', marginBottom: 4 }}>DURACIÓN (MIN)</label>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', display: 'block', marginBottom: 4 }}>
+                    {form.modality === 'ENCARGO' ? 'TIEMPO ESTIMADO RETIRO (MIN)' : 'DURACIÓN DE LA CITA (MIN)'}
+                  </label>
                   <input 
                     type="number" step="5"
                     style={{ width: '100%', padding: 14, borderRadius: 12, border: '1px solid var(--border)', background: 'var(--bg)' }}

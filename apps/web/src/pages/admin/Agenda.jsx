@@ -425,8 +425,24 @@ export default function Agenda() {
                   <div style={{ fontSize: 11, color: 'var(--muted)' }}>{formatTime(a.endsAt)}</div>
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 15, fontWeight: 700 }}>{a.guestName || a.client?.fullName}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: 15, fontWeight: 700 }}>{a.guestName || a.client?.fullName}</span>
+                    {a.service?.modality && (
+                      <span style={{
+                        background: a.service.modality === 'ONLINE' ? 'rgba(59, 130, 246, 0.12)' : a.service.modality === 'ENCARGO' ? 'rgba(168, 85, 247, 0.12)' : 'rgba(34, 197, 94, 0.12)',
+                        color: a.service.modality === 'ONLINE' ? '#3b82f6' : a.service.modality === 'ENCARGO' ? '#a855f7' : '#22c55e',
+                        padding: '1px 6px', borderRadius: 4, fontSize: 9, fontWeight: 800
+                      }}>
+                        {a.service.modality === 'ONLINE' ? '💻 Online' : a.service.modality === 'ENCARGO' ? '📦 Encargo' : '🏢 Presencial'}
+                      </span>
+                    )}
+                  </div>
                   <div style={{ fontSize: 12, color: 'var(--muted)' }}>{a.service?.name}</div>
+                  {a.notes && (
+                    <div style={{ fontSize: 11, color: a.service?.modality === 'ENCARGO' ? '#a855f7' : 'var(--text)', marginTop: 2, background: 'rgba(0,0,0,0.03)', padding: '2px 6px', borderRadius: 4, display: 'inline-block' }}>
+                      {a.service?.modality === 'ENCARGO' ? '✍️ Encargo: ' : '📝 '}{a.notes}
+                    </div>
+                  )}
                   {a.client?.colorFormula && (
                     <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--accent)', marginTop: 2 }}>📋 {a.client.colorFormula}</div>
                   )}
@@ -461,10 +477,21 @@ export default function Agenda() {
           >
             <div style={{ width: 40, height: 5, background: '#eee', borderRadius: 3, margin: '0 auto 10px' }} />
             <div>
-              <h3 style={{ fontSize: 18, fontWeight: 800 }}>{selectedApp.guestName || selectedApp.client?.fullName}</h3>
-              <p style={{ color: 'var(--muted)', fontSize: 14 }}>{selectedApp.service?.name} · {formatTime(selectedApp.startsAt)} - {formatTime(selectedApp.endsAt)}</p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                <h3 style={{ fontSize: 18, fontWeight: 800, margin: 0 }}>{selectedApp.guestName || selectedApp.client?.fullName}</h3>
+                {selectedApp.service?.modality && (
+                  <span style={{
+                    background: selectedApp.service.modality === 'ONLINE' ? 'rgba(59, 130, 246, 0.12)' : selectedApp.service.modality === 'ENCARGO' ? 'rgba(168, 85, 247, 0.12)' : 'rgba(34, 197, 94, 0.12)',
+                    color: selectedApp.service.modality === 'ONLINE' ? '#3b82f6' : selectedApp.service.modality === 'ENCARGO' ? '#a855f7' : '#22c55e',
+                    padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 800
+                  }}>
+                    {selectedApp.service.modality === 'ONLINE' ? '💻 Online' : selectedApp.service.modality === 'ENCARGO' ? '📦 Encargo' : '🏢 Presencial'}
+                  </span>
+                )}
+              </div>
+              <p style={{ color: 'var(--muted)', fontSize: 14, marginTop: 4 }}>{selectedApp.service?.name} · {formatTime(selectedApp.startsAt)} - {formatTime(selectedApp.endsAt)}</p>
               <div style={{ 
-                display: 'inline-block', marginTop: 6, fontSize: 11, fontWeight: 800, padding: '4px 10px', borderRadius: 6,
+                display: 'inline-block', marginTop: 4, fontSize: 11, fontWeight: 800, padding: '4px 10px', borderRadius: 6,
                 background: (selectedApp.status === 'COMPLETED' ? '#22c55e' : selectedApp.status === 'CONFIRMED' ? '#3b82f6' : selectedApp.status === 'PENDING' ? '#f59e0b' : '#ef4444') + '22',
                 color: selectedApp.status === 'COMPLETED' ? '#22c55e' : selectedApp.status === 'CONFIRMED' ? '#3b82f6' : selectedApp.status === 'PENDING' ? '#f59e0b' : '#ef4444'
               }}>
@@ -472,11 +499,23 @@ export default function Agenda() {
               </div>
             </div>
 
+            {/* NOTAS / ESPECIFICACIONES DE ENCARGO */}
+            {selectedApp.notes && (
+              <div style={{ background: 'var(--bg)', borderRadius: 14, padding: 14, border: '0.5px solid var(--border)' }}>
+                <span style={{ fontSize: 11, fontWeight: 800, color: selectedApp.service?.modality === 'ENCARGO' ? '#a855f7' : 'var(--accent)' }}>
+                  {selectedApp.service?.modality === 'ENCARGO' ? '✍️ ESPECIFICACIONES DEL ENCARGO' : '📝 NOTAS DE LA ATENCIÓN'}
+                </span>
+                <div style={{ fontSize: 13, marginTop: 4, color: 'var(--text)', whiteSpace: 'pre-wrap' }}>
+                  {selectedApp.notes}
+                </div>
+              </div>
+            )}
+
             {/* SEÑA / DEPÓSITO SECTION */}
             {selectedApp.depositReceiptUrl && (
               <div style={{ background: 'var(--bg)', borderRadius: 14, padding: 14, border: '0.5px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--muted)' }}>⚡ SEÑA ANTI NO-SHOW</span>
+                  <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--muted)' }}>⚡ SEÑA O ABONO</span>
                   <button 
                     onClick={() => toggleDepositPaid(selectedApp)}
                     style={{
@@ -507,7 +546,7 @@ export default function Agenda() {
 
             {/* CAMBIAR ESTADO */}
             <div style={{ display: 'flex', gap: 8 }}>
-              {[{ key: 'CONFIRMED', label: 'Confirmar', icon: '✅' }, { key: 'COMPLETED', label: 'Completada', icon: '💈' }, { key: 'CANCELED', label: 'Cancelar', icon: '❌' }].map(s => (
+              {[{ key: 'CONFIRMED', label: 'Confirmar', icon: '✅' }, { key: 'COMPLETED', label: 'Completada', icon: '✨' }, { key: 'CANCELED', label: 'Cancelar', icon: '❌' }].map(s => (
                 <button 
                   key={s.key}
                   onClick={() => handleStatus(selectedApp.id, s.key)}

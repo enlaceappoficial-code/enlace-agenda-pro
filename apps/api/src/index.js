@@ -348,6 +348,8 @@ app.post(
         price: z.number().int().min(0),
         description: z.string().optional(),
         active: z.boolean().optional(),
+        modality: z.string().optional(),
+        instructions: z.string().nullable().optional(),
         costMaterials: z.number().min(0).optional(),
         costEquipment: z.number().min(0).optional(),
         depositRequired: z.boolean().optional(),
@@ -368,6 +370,8 @@ app.post(
         price: body.price,
         description: body.description || null,
         active: body.active ?? true,
+        modality: body.modality || "PRESENCIAL",
+        instructions: body.instructions || null,
         costMaterials: body.costMaterials || 0,
         costEquipment: body.costEquipment || 0,
         costTotal: body.costTotal || 0,
@@ -406,6 +410,8 @@ app.patch(
         price: z.number().int().min(0).optional(),
         description: z.string().nullable().optional(),
         active: z.boolean().optional(),
+        modality: z.string().optional(),
+        instructions: z.string().nullable().optional(),
         costMaterials: z.number().min(0).optional(),
         costEquipment: z.number().min(0).optional(),
         depositRequired: z.boolean().optional(),
@@ -701,6 +707,9 @@ app.get(
   requireAuth,
   asyncHandler(async (req, res) => {
     const shop = await prisma.shop.findUnique({ where: { id: req.session.shopId } })
+    if (!shop) {
+      return res.status(401).json({ error: "SHOP_NOT_FOUND" });
+    }
     const pending = await prisma.enlaceOutbox.count({
       where: { shopId: req.session.shopId, status: { in: ["PENDING", "FAILED"] } },
     });

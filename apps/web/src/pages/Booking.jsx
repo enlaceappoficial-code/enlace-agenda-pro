@@ -10,6 +10,7 @@ export default function Booking() {
   const [loading, setLoading] = useState(true)
 
   const [step, setStep] = useState(1) // 1: Servicio, 2: Fecha, 3: Hora, 4: Datos, 5: Pago (Si aplica)
+  const [activeCategory, setActiveCategory] = useState('Todas')
   const [selService, setSelService] = useState(null)
   const [selDate, setSelDate] = useState(null)
   const [selTime, setSelTime] = useState(null)
@@ -188,41 +189,110 @@ export default function Booking() {
       <div style={{ flex: 1, padding: 16 }}>
 
         {/* STEP 1: SERVICIOS */}
-        {step === 1 && (
-          <div>
-            <h2 style={{ fontSize: 18, fontWeight: 800, marginBottom: 16 }}>1. Elige un servicio</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {services.map(s => (
-                <div 
-                  key={s.id} 
-                  onClick={() => { setSelService(s); nextStep() }}
-                  style={{ background: 'var(--card)', padding: 16, borderRadius: 14, border: '0.5px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
-                >
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 800, fontSize: 16 }}>{s.name}</div>
-                    <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>{s.description || `${s.durationMin} min`}</div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent)', marginTop: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <span>⏱️ {s.durationMin} min</span>
-                      {shop.depositEnabled && s.depositRequired && (
-                        <span style={{ background: 'rgba(245, 160, 32, 0.1)', color: 'var(--orange)', padding: '2px 6px', borderRadius: 6, fontSize: 10, fontWeight: 800 }}>
-                          ⚡ Requiere Seña
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <div style={{ fontWeight: 800, fontSize: 18 }}>${s.price.toLocaleString('es-CL')}</div>
+        {step === 1 && (() => {
+          const categories = ['Todas', ...Array.from(new Set(services.map(s => s.category).filter(Boolean)))]
+          const filteredServices = activeCategory === 'Todas' ? services : services.filter(s => s.category === activeCategory)
+
+          return (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                <h2 style={{ fontSize: 18, fontWeight: 800, margin: 0 }}>1. Elige una atención o servicio</h2>
+                <span style={{ fontSize: 11, color: 'var(--muted)', fontWeight: 700 }}>{filteredServices.length} opciones</span>
+              </div>
+
+              {/* CATEGORY FILTER PILLS */}
+              {categories.length > 2 && (
+                <div style={{ 
+                  display: 'flex', 
+                  gap: 8, 
+                  overflowX: 'auto', 
+                  paddingBottom: 10, 
+                  marginBottom: 14, 
+                  scrollbarWidth: 'none',
+                  WebkitOverflowScrolling: 'touch'
+                }}>
+                  {categories.map(cat => {
+                    const isSelected = activeCategory === cat
+                    return (
+                      <button
+                        key={cat}
+                        type="button"
+                        onClick={() => setActiveCategory(cat)}
+                        style={{
+                          whiteSpace: 'nowrap',
+                          padding: '8px 16px',
+                          borderRadius: 20,
+                          border: isSelected ? '1px solid var(--accent)' : '1px solid var(--border)',
+                          background: isSelected ? 'var(--accent)' : 'var(--card)',
+                          color: isSelected ? 'white' : 'var(--text)',
+                          fontWeight: isSelected ? 800 : 600,
+                          fontSize: 12,
+                          cursor: 'pointer',
+                          transition: 'all 0.15s ease',
+                          flexShrink: 0
+                        }}
+                      >
+                        {cat}
+                      </button>
+                    )
+                  })}
                 </div>
-              ))}
+              )}
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {filteredServices.map(s => (
+                  <div 
+                    key={s.id} 
+                    onClick={() => { setSelService(s); nextStep() }}
+                    style={{ background: 'var(--card)', padding: 16, borderRadius: 14, border: '0.5px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
+                  >
+                    <div style={{ flex: 1, paddingRight: 10 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                        <span style={{ fontWeight: 800, fontSize: 15 }}>{s.name}</span>
+                        <span style={{
+                          background: s.modality === 'ONLINE' ? 'rgba(59, 130, 246, 0.12)' : s.modality === 'ENCARGO' ? 'rgba(168, 85, 247, 0.12)' : 'rgba(34, 197, 94, 0.12)',
+                          color: s.modality === 'ONLINE' ? '#3b82f6' : s.modality === 'ENCARGO' ? '#a855f7' : '#22c55e',
+                          padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 800
+                        }}>
+                          {s.modality === 'ONLINE' ? '💻 Online' : s.modality === 'ENCARGO' ? '📦 Encargo' : '🏢 Presencial'}
+                        </span>
+                      </div>
+                      
+                      <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 4 }}>
+                        {s.description || (s.modality === 'ENCARGO' ? 'Producto personalizado por encargo' : `${s.durationMin} min`)}
+                      </div>
+
+                      {s.instructions && (
+                        <div style={{ fontSize: 11, color: 'var(--accent)', marginTop: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
+                          <span>ℹ️</span> <span>{s.instructions}</span>
+                        </div>
+                      )}
+
+                      <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent)', marginTop: 6, display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                        <span>{s.modality === 'ENCARGO' ? `📦 Retiro: ~${s.durationMin} min` : `⏱️ ${s.durationMin} min`}</span>
+                        {shop.depositEnabled && s.depositRequired && (
+                          <span style={{ background: 'rgba(245, 160, 32, 0.1)', color: 'var(--orange)', padding: '2px 6px', borderRadius: 6, fontSize: 10, fontWeight: 800 }}>
+                            ⚡ Requiere Seña (${s.depositAmount?.toLocaleString('es-CL') || '50%'})
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div style={{ fontWeight: 800, fontSize: 17, whiteSpace: 'nowrap' }}>${s.price.toLocaleString('es-CL')}</div>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )
+        })()}
 
         {/* STEP 2: FECHA */}
         {step === 2 && (
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
               <button onClick={prevStep} style={{ border: 'none', background: 'transparent', fontSize: 20, cursor: 'pointer' }}>←</button>
-              <h2 style={{ fontSize: 18, fontWeight: 800 }}>2. Selecciona el día</h2>
+              <h2 style={{ fontSize: 18, fontWeight: 800 }}>
+                {selService?.modality === 'ENCARGO' ? '2. Día de retiro o entrega' : '2. Selecciona el día'}
+              </h2>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
               {availableDates.map(d => (
@@ -250,7 +320,9 @@ export default function Booking() {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
               <button onClick={prevStep} style={{ border: 'none', background: 'transparent', fontSize: 20, cursor: 'pointer' }}>←</button>
-              <h2 style={{ fontSize: 18, fontWeight: 800 }}>3. Elige la hora</h2>
+              <h2 style={{ fontSize: 18, fontWeight: 800 }}>
+                {selService?.modality === 'ENCARGO' ? '3. Hora estimada de retiro' : '3. Elige la hora'}
+              </h2>
             </div>
             {loadingSlots ? (
               <div style={{ textAlign: 'center', padding: 20, color: 'var(--muted)' }}>Cargando horas...</div>
@@ -286,16 +358,35 @@ export default function Booking() {
             </div>
 
             <div style={{ background: 'var(--card)', borderRadius: 14, border: '0.5px solid var(--border)', padding: 16, marginBottom: 20 }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--muted)', marginBottom: 8 }}>RESUMEN</div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--muted)' }}>RESUMEN</span>
+                <span style={{
+                  background: selService?.modality === 'ONLINE' ? 'rgba(59, 130, 246, 0.12)' : selService?.modality === 'ENCARGO' ? 'rgba(168, 85, 247, 0.12)' : 'rgba(34, 197, 94, 0.12)',
+                  color: selService?.modality === 'ONLINE' ? '#3b82f6' : selService?.modality === 'ENCARGO' ? '#a855f7' : '#22c55e',
+                  padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 800
+                }}>
+                  {selService?.modality === 'ONLINE' ? '💻 Online / Remoto' : selService?.modality === 'ENCARGO' ? '📦 Encargo personalizado' : '🏢 Presencial'}
+                </span>
+              </div>
               <div style={{ fontWeight: 800, fontSize: 16 }}>{selService.name}</div>
               <div style={{ fontSize: 14, color: 'var(--text)', marginTop: 4 }}>
+                {selService?.modality === 'ENCARGO' ? '📦 Fecha de retiro: ' : '📅 '}
                 {new Date(selDate.iso + 'T12:00:00').toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
               </div>
-              <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--accent)', marginTop: 4 }}>{selTime} hrs</div>
+              <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--accent)', marginTop: 4 }}>
+                {selService?.modality === 'ENCARGO' ? `Hora estimada: ${selTime} hrs` : `${selTime} hrs`}
+              </div>
+
+              {selService?.instructions && (
+                <div style={{ background: 'rgba(37, 99, 235, 0.06)', border: '1px solid rgba(37, 99, 235, 0.2)', padding: 10, borderRadius: 10, marginTop: 10, fontSize: 12, color: 'var(--text)' }}>
+                  <strong style={{ color: 'var(--accent)' }}>📌 Indicaciones: </strong>
+                  <span>{selService.instructions}</span>
+                </div>
+              )}
               
               {isMandatoryDeposit && (
                 <div style={{ background: 'rgba(245, 160, 32, 0.08)', border: '1px solid var(--orange)', color: 'var(--orange)', padding: 8, borderRadius: 8, fontSize: 11, fontWeight: 800, marginTop: 10, textAlign: 'center' }}>
-                  ⚡ Requiere Seña de ${selService.depositAmount.toLocaleString('es-CL')} para agendar
+                  ⚡ Requiere Seña de ${selService.depositAmount.toLocaleString('es-CL')} para {selService.modality === 'ENCARGO' ? 'iniciar fabricación' : 'agendar'}
                 </div>
               )}
               {isSuggestedPrepayment && (
@@ -324,12 +415,30 @@ export default function Booking() {
                 value={form.email}
                 onChange={e => setForm({ ...form, email: e.target.value })}
               />
-              <textarea 
-                placeholder="Notas o comentarios (opcional)" 
-                style={{ padding: 16, borderRadius: 12, border: '1px solid var(--border)', fontSize: 15, minHeight: 80 }}
-                value={form.notes}
-                onChange={e => setForm({ ...form, notes: e.target.value })}
-              />
+
+              {selService?.modality === 'ENCARGO' ? (
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 800, color: 'var(--accent)', display: 'block', marginBottom: 4 }}>
+                    ✍️ ESPECIFICACIONES DE TU PEDIDO / TIMBRE *
+                  </label>
+                  <textarea 
+                    placeholder="Escribe el texto exacto del timbre (Nombre, Rut, Cargo), color de tinta (negro/azul/rojo), dibujo o detalles específicos..." 
+                    style={{ width: '100%', padding: 14, borderRadius: 12, border: '2px solid var(--accent)', background: 'rgba(37, 99, 235, 0.03)', fontSize: 14, minHeight: 90, boxSizing: 'border-box' }}
+                    value={form.notes}
+                    onChange={e => setForm({ ...form, notes: e.target.value })}
+                  />
+                  <span style={{ fontSize: 11, color: 'var(--muted)', display: 'block', marginTop: 4 }}>
+                    💡 Con estos datos prepararemos tu diseño o fabricación antes de tu entrega.
+                  </span>
+                </div>
+              ) : (
+                <textarea 
+                  placeholder="Notas o comentarios adicionales (opcional)" 
+                  style={{ padding: 16, borderRadius: 12, border: '1px solid var(--border)', fontSize: 15, minHeight: 80 }}
+                  value={form.notes}
+                  onChange={e => setForm({ ...form, notes: e.target.value })}
+                />
+              )}
 
               {/* OPTION C: MOSTRAR DATOS POST-PAGO RAPIDO */}
               {shop.fastPaymentEnabled && (
@@ -349,7 +458,7 @@ export default function Booking() {
                     📱 Pago Rápido Post-Servicio Sugerido
                   </div>
                   <p style={{ fontSize: 11, color: 'var(--muted)', margin: 0, lineHeight: 1.4 }}>
-                    Para que tu experiencia al salir de tu corte sea súper rápida, te sugerimos guardar nuestra cuenta para transferencias en tu app del banco:
+                    Para que tu experiencia en tu atención sea súper rápida, te sugerimos guardar nuestra cuenta para transferencias en tu app del banco:
                   </p>
                   <div style={{ background: 'var(--card)', padding: 12, borderRadius: 12, fontSize: 11, fontWeight: 700, display: 'flex', flexDirection: 'column', gap: 6, border: '0.5px solid var(--border)' }}>
                     <div>🏦 Banco: <strong>{shop.barberBankName}</strong></div>
@@ -393,6 +502,10 @@ export default function Booking() {
                     alert('📱 Por favor, ingresa tu número de WhatsApp para enviarte la confirmación.')
                     return
                   }
+                  if (selService?.modality === 'ENCARGO' && !form.notes.trim()) {
+                    alert('✍️ Por favor, ingresa las especificaciones de tu encargo (ej: texto del timbre, color de tinta o modelo) en el campo de especificaciones.')
+                    return
+                  }
                   if (hasStep5) {
                     nextStep()
                   } else {
@@ -405,7 +518,7 @@ export default function Booking() {
                   color: 'white', fontWeight: 800, fontSize: 16, cursor: 'pointer'
                 }}
               >
-                {hasStep5 ? 'Siguiente ➔' : 'Confirmar Reserva'}
+                {hasStep5 ? 'Siguiente ➔' : (selService?.modality === 'ENCARGO' ? 'Confirmar Pedido de Encargo' : 'Confirmar Reserva')}
               </button>
             </div>
           </div>
@@ -576,7 +689,7 @@ export default function Booking() {
                 color: 'white', fontWeight: 800, fontSize: 16, cursor: 'pointer'
               }}
             >
-              {uploadingReceipt ? 'Procesando captura...' : (isMandatoryDeposit ? 'Finalizar Reserva con Seña ✓' : 'Finalizar con Pago Anticipado ✓')}
+              {uploadingReceipt ? 'Procesando captura...' : (isMandatoryDeposit ? (selService?.modality === 'ENCARGO' ? 'Finalizar Encargo con Abono ✓' : 'Finalizar Reserva con Seña ✓') : 'Finalizar con Pago Anticipado ✓')}
             </button>
 
             {/* SKIP BUTTON FOR OPTIONAL PREPAYMENT (OPTION B) */}
@@ -589,7 +702,7 @@ export default function Booking() {
                   cursor: 'pointer', marginTop: 10
                 }}
               >
-                Omitir y Pagar en el Salón ➔
+                Omitir y Pagar al Momento de la Atención ➔
               </button>
             )}
           </div>
@@ -601,7 +714,7 @@ export default function Booking() {
       <div style={{ padding: 20, textAlign: 'center', opacity: 0.5, marginTop: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
         <img src="/enlace-logo.png" alt="Enlace" style={{ width: 16, height: 16, objectFit: 'contain' }} />
         <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text)' }}>
-          Funciona con Enlace {shop?.businessType === 'peluqueria' ? 'Peluquería' : 'Barbería'} Pro
+          Funciona con Enlace Agenda Pro
         </div>
       </div>
 

@@ -110,6 +110,8 @@ model Service {
   price       Int
   description String?
   active      Boolean  @default(true)
+  modality    String   @default("PRESENCIAL")
+  instructions String?
   costMaterials  Float @default(0)
   costEquipment  Float @default(0)
   costTotal      Float @default(0)
