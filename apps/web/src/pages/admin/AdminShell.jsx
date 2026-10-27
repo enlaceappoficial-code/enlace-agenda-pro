@@ -138,8 +138,12 @@ export default function AdminShell() {
                 <img src={shop.logoUrl} alt={shop?.name || 'Logo'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
             ) : (
-              <div style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <img src="/logo-icon_1.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+              <div style={{
+                width: 44, height: 44, borderRadius: 12, border: '1.5px solid var(--border)',
+                overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: 'transparent', flexShrink: 0,
+              }}>
+                <img src="/logo-icon_1.png" alt="Enlace Agenda Pro" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
             )}
             <div style={{ minWidth: 0, flex: 1 }}>
@@ -362,14 +366,17 @@ export default function AdminShell() {
             ) : (
               <div style={{
                 width: 38, height: 38,
+                borderRadius: 10,
+                border: '1.5px solid var(--border)',
+                overflow: 'hidden',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 background: 'transparent',
                 flexShrink: 0,
               }}>
                 <img
                   src="/logo-icon_1.png"
-                  alt="Enlace Barbería"
-                  style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                  alt="Enlace Agenda Pro"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
               </div>
             )}

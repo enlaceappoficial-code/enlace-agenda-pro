@@ -163,17 +163,17 @@ export default function Booking() {
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <div style={{ width: 60, height: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 4 }}>
-               <img src="/logo-icon.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+            <div style={{ width: 60, height: 60, borderRadius: 12, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 6, border: '1.5px solid rgba(255,255,255,0.2)' }}>
+               <img src="/logo-icon_1.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
             <div>
               <span style={{ fontSize: 20, fontWeight: 800, color: 'white', letterSpacing: '-0.5px' }}>ENLACE</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: -4 }}>
               <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.7)' }}>
-                {shop.businessType === 'peluqueria' ? 'PELUQUERÍA' : 'BARBERÍA'}
+                {shop.businessType === 'asesoria' ? 'ASESORÍA' : 'AGENDA'}
               </span>
-              <span style={{ fontSize: 10, fontWeight: 800, color: 'var(--red)' }}>PRO</span>
+              <span style={{ fontSize: 10, fontWeight: 800, color: 'var(--accent)' }}>PRO</span>
             </div>
             <div style={{ fontSize: 13, fontWeight: 600, marginTop: 8, opacity: 0.9 }}>{shop.name}</div>
           </div>
