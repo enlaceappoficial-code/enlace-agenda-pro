@@ -1,0 +1,25 @@
+{
+  "short_name": "Agenda Pro",
+  "name": "Enlace Agenda Pro",
+  "description": "Sistema Inteligente de Agenda, Citas y Reservas para Profesionales y Empresas",
+  "icons": [
+    {
+      "src": "/logo-icon.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo-icon.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#071A3A",
+  "theme_color": "#071A3A",
+  "display": "standalone",
+  "orientation": "any",
+  "categories": ["business", "productivity", "lifestyle"]
+}

@@ -1,0 +1,146 @@
+/* ============================================================
+   ENLACE AGENDA PRO — ENTERPRISE CLINICAL THEME
+   Concepto: Software médico enterprise. Stripe + Linear.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap');
+
+[data-theme="agenda-pro"],
+[data-theme="claro"],
+:root[data-theme="agenda-pro"],
+:root[data-theme="claro"] {
+
+  /* ─── PALETA CORE ─── */
+  --primary:          #2563EB;
+  --primary-hover:    #3473F6;
+  --primary-active:   #1E4FD1;
+  --primary-glow:     rgba(37, 99, 235, 0.12);
+  --primary-subtle:   rgba(37, 99, 235, 0.06);
+
+  /* ─── FONDOS ─── */
+  --background:       #F8FAFC;
+  --card-bg:          #FFFFFF;
+  --card-bg-2:        #F1F5F9;
+  --overlay:          rgba(248, 250, 252, 0.95);
+
+  /* ─── BORDES ─── */
+  --border:           #E2E8F0;
+  --border-strong:    #CBD5E1;
+
+  /* ─── TEXTOS ─── */
+  --text-main:        #0F172A;
+  --text-muted:       #64748B;
+  --text-soft:        #94A3B8;
+
+  /* ─── SEMÁNTICOS ─── */
+  --bg:               var(--background);
+  --card:             var(--card-bg);
+  --hover:            #F1F5F9;
+  --text:             var(--text-main);
+  --muted:            var(--text-muted);
+  --accent:           var(--primary);
+  --accent-dark:      var(--primary-active);
+  --nav-bg:           #FFFFFF;
+  --nav-border:       #E2E8F0;
+  --btn-secondary:    #F1F5F9;
+  --btn-secondary-text: #0F172A;
+  --red:              #EF4444;
+  --orange:           #F59E0B;
+  --green:            #16A34A;
+
+  /* ─── TIPOGRAFÍA ─── */
+  --font-heading:     'Space Grotesk', system-ui, sans-serif;
+  --font-body:        'Inter', system-ui, sans-serif;
+  --fw-heading:       700;
+  --ls-heading:       -0.03em;
+
+  /* ─── RADIOS — Compactos, eficientes, corporativos ─── */
+  --radius-xl:        12px;
+  --radius-lg:        8px;
+  --radius-md:        6px;
+  --radius-sm:        4px;
+  --radius-xs:        3px;
+
+  /* ─── SOMBRAS — Limpias, corporativas, tipo Stripe ─── */
+  --shadow-card:      0 1px 3px rgba(0,0,0,0.06),
+                      0 1px 2px rgba(0,0,0,0.04),
+                      0 0 0 1px rgba(0,0,0,0.03);
+  --shadow-popover:   0 4px 6px rgba(0,0,0,0.05),
+                      0 10px 20px rgba(0,0,0,0.04),
+                      0 0 0 1px rgba(0,0,0,0.04);
+  --shadow-glow:      0 0 0 3px rgba(37,99,235,0.18);
+  --shadow-btn:       0 1px 2px rgba(37,99,235,0.20);
+  --shadow-inset:     inset 0 1px 0 rgba(255,255,255,1.0);
+
+  /* ─── EFECTOS ─── */
+  --backdrop-blur:    none;
+
+  /* ─── MOTION — Rápido, instantáneo, eficiente ─── */
+  --transition-speed: 150ms;
+  --motion-ease:      cubic-bezier(0.16, 1, 0.3, 1);
+  --transition:       all 150ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ─── AGENDA ─── */
+  --slot-selected-bg:     rgba(37,99,235,0.08);
+  --slot-selected-border: #2563EB;
+  --slot-selected-glow:   0 0 0 2px rgba(37,99,235,0.20);
+
+  /* ─── IDENTIDAD ─── */
+  --app-name:         "AGENDA PRO";
+  --app-label-color:  #16A34A;
+}
+
+[data-theme="agenda-pro"] body,
+[data-theme="claro"] body {
+  font-family: var(--font-body);
+}
+
+[data-theme="agenda-pro"] h1,
+[data-theme="agenda-pro"] h2,
+[data-theme="agenda-pro"] h3,
+[data-theme="claro"] h1,
+[data-theme="claro"] h2,
+[data-theme="claro"] h3 {
+  font-family: var(--font-heading);
+  font-weight: var(--fw-heading);
+  letter-spacing: var(--ls-heading);
+}
+
+[data-theme="agenda-pro"] ::-webkit-scrollbar {
+  width: 6px;
+}
+[data-theme="agenda-pro"] ::-webkit-scrollbar-track {
+  background: var(--background);
+}
+[data-theme="agenda-pro"] ::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 999px;
+}
+[data-theme="agenda-pro"] ::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+[data-theme="agenda-pro"] .glass {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-card);
+}
+
+[data-theme="agenda-pro"] .btn-primary {
+  background: var(--primary);
+  box-shadow: var(--shadow-btn);
+  color: #FFFFFF;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition: var(--transition);
+}
+[data-theme="agenda-pro"] .btn-primary:hover {
+  background: var(--primary-hover);
+  box-shadow: 0 2px 8px rgba(37,99,235,0.30);
+  transform: translateY(-1px);
+}
+[data-theme="agenda-pro"] .btn-primary:active {
+  background: var(--primary-active);
+  transform: translateY(0px);
+  box-shadow: var(--shadow-btn);
+}

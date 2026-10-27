@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enlace Master - Generador de Códigos</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #0f172a; }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    .app-card { transition: all 0.2s; border: 2px solid transparent; }
+    .app-card.active { border-color: #2563eb; background-color: #eff6ff; color: #1d4ed8; }
+    .app-card:not(.active):not(.disabled):hover { border-color: #e2e8f0; }
+    .app-card.disabled { opacity: 0.5; filter: grayscale(1); cursor: not-allowed; background-color: #f8fafc; }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+  <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-12 gap-8">
+    
+    <!-- PANEL IZQUIERDO: FORMULARIO -->
+    <div class="lg:col-span-5 bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-8 border border-slate-100 h-fit">
+      <div class="flex items-center gap-3 mb-8">
+        <div class="bg-blue-600 p-3 rounded-2xl text-white shadow-lg shadow-blue-500/30">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+        </div>
+        <div>
+          <h1 class="text-2xl font-black text-slate-800 tracking-tight">ENLACE <span class="text-blue-600">MASTER</span></h1>
+          <p class="text-sm font-medium text-slate-500">Generador de Códigos de Acceso</p>
+        </div>
+      </div>
+
+      <form id="generatorForm" class="space-y-5">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">RUT</label>
+            <input type="text" id="rutInput" placeholder="12.345.678-9" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Teléfono / WhatsApp</label>
+            <input type="text" id="phoneInput" placeholder="+56912345678" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Nombre del Cliente</label>
+            <input type="text" id="nameInput" placeholder="Juan Pérez" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Correo Electrónico</label>
+            <input type="email" id="emailInput" placeholder="correo@ejemplo.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 mt-2">Ciudad</label>
+          <input type="text" id="cityInput" placeholder="Santiago" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" />
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 mt-2">Aplicación</label>
+          <div class="grid grid-cols-1 gap-2" id="appSelector"></div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Plan</label>
+            <select id="planSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 font-bold focus:ring-2 focus:ring-blue-500 outline-none appearance-none">
+              <option value="BASIC">Plan Básico</option>
+              <option value="PLUS">Plan Plus</option>
+              <option value="PRO" selected>Plan PRO</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Duración</label>
+            <select id="durationSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 font-bold focus:ring-2 focus:ring-blue-500 outline-none appearance-none">
+              <option value="6">6 Meses</option>
+              <option value="12" selected>1 Año</option>
+              <option value="1200">Vitalicio (100 años)</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="errorBox" class="hidden bg-red-50 text-red-600 font-bold text-sm p-4 rounded-xl border border-red-100 flex items-center gap-2 mt-4"></div>
+
+        <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black text-lg py-4 rounded-xl shadow-lg shadow-blue-500/30 transition-all active:scale-[0.98] flex justify-center items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed mt-4">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>
+          <span id="submitText">Emitir Código</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- PANEL DERECHO: HISTORIAL -->
+    <div class="lg:col-span-7 flex flex-col h-[750px]">
+      <div class="mb-6 flex justify-between items-end">
+        <div>
+          <h2 class="text-xl font-black text-slate-800">Memoria de Licencias</h2>
+          <p class="text-sm text-slate-500 font-medium">Historial completo de códigos emitidos en la plataforma.</p>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="downloadExcel()" class="text-emerald-600 hover:bg-emerald-50 p-2 rounded-lg transition-colors" title="Descargar Excel">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </button>
+          <button onclick="fetchHistory()" class="text-blue-600 hover:bg-blue-50 p-2 rounded-lg transition-colors" title="Actualizar">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div id="historyList" class="flex-1 space-y-4 overflow-y-auto pr-2 custom-scrollbar pb-4">
+        <div id="loadingState" class="h-full flex flex-col items-center justify-center text-slate-400">
+          <svg class="animate-spin mb-4 text-blue-500" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+          <p class="font-medium">Cargando base de datos...</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const APPS = [
+      { id: 'PELUQUERIA', name: 'Barbería / Peluquería', icon: '<path d="M20 4L10 14"/><path d="M20 20L10 10"/><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/>', active: true },
+      { id: 'RESTORAN', name: 'Restaurante / POS', icon: '<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>', active: false },
+      { id: 'AGENDA_PRO', name: 'Agenda Pro (Medicina)', icon: '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>', active: false },
+    ];
+
+    let currentApp = 'PELUQUERIA';
+    let currentCodes = [];
+    const API_BASE = 'https://api-barberia.redenlace.cl/api/master/codes';
+    const SECRET_KEY = 'enlace-master-key-123';
+
+    // Render App Selector
+    const appSelector = document.getElementById('appSelector');
+    function renderApps() {
+      appSelector.innerHTML = APPS.map(app => `
+        <button
+          type="button"
+          onclick="selectApp('${app.id}')"
+          ${!app.active ? 'disabled' : ''}
+          class="app-card flex items-center gap-3 p-3.5 rounded-xl border-2 cursor-pointer w-full text-left
+            ${currentApp === app.id ? 'active' : 'text-slate-600 bg-white border-slate-100'} 
+            ${!app.active ? 'disabled' : ''}"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="${currentApp === app.id ? 'text-blue-600' : 'text-slate-400'}">${app.icon}</svg>
+          <span class="font-bold flex-1 text-sm">${app.name}</span>
+          ${!app.active ? '<span class="text-[10px] font-black uppercase tracking-wider bg-slate-200 text-slate-500 px-2 py-0.5 rounded-md">Pronto</span>' : ''}
+        </button>
+      `).join('');
+    }
+    function selectApp(id) { currentApp = id; renderApps(); }
+    renderApps();
+
+    const form = document.getElementById('generatorForm');
+    const historyList = document.getElementById('historyList');
+
+    // Fetch History
+    async function fetchHistory() {
+      historyList.innerHTML = `<div class="h-full flex flex-col items-center justify-center text-slate-400">
+        <svg class="animate-spin mb-4 text-blue-500" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+      </div>`;
+      
+      try {
+        const res = await fetch(API_BASE, { headers: { 'x-master-secret': SECRET_KEY } });
+        const data = await res.json();
+        currentCodes = data.codes || [];
+        
+        if (data.codes && data.codes.length > 0) {
+          historyList.innerHTML = '';
+          data.codes.forEach(codeData => historyList.insertAdjacentHTML('beforeend', buildCard(codeData)));
+        } else {
+          historyList.innerHTML = `<div class="h-full flex flex-col items-center justify-center text-slate-400 border-2 border-dashed border-slate-200 rounded-3xl p-8 bg-slate-50/50">
+            <p class="font-medium">No hay códigos emitidos aún.</p>
+          </div>`;
+        }
+      } catch (e) {
+        historyList.innerHTML = `<div class="text-red-500 p-4 font-bold text-center">Error al cargar historial</div>`;
+      }
+    }
+
+    // Submit New Code
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const payload = {
+        rutClient: document.getElementById('rutInput').value.trim(),
+        clientName: document.getElementById('nameInput').value.trim(),
+        clientPhone: document.getElementById('phoneInput').value.trim(),
+        clientEmail: document.getElementById('emailInput').value.trim(),
+        clientCity: document.getElementById('cityInput').value.trim(),
+        appId: currentApp,
+        planId: document.getElementById('planSelect').value,
+        durationMonths: parseInt(document.getElementById('durationSelect').value),
+        maxUses: 1
+      };
+
+      const errorBox = document.getElementById('errorBox');
+      const submitBtn = document.getElementById('submitBtn');
+      const submitText = document.getElementById('submitText');
+
+      errorBox.classList.add('hidden');
+      submitBtn.disabled = true;
+      submitText.textContent = 'Generando...';
+
+      try {
+        const res = await fetch(`${API_BASE}/generate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-master-secret': SECRET_KEY },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Error de conexión');
+
+        // Reload history immediately to show the new card
+        await fetchHistory();
+        
+        // Don't reset fields entirely, just reset the app maybe or leave it for next input
+      } catch (err) {
+        errorBox.textContent = '❌ ' + err.message;
+        errorBox.classList.remove('hidden');
+      } finally {
+        submitBtn.disabled = false;
+        submitText.textContent = 'Emitir Código';
+      }
+    });
+
+    // Helper functions
+    function formatDate(iso) {
+      if (!iso) return '-';
+      const d = new Date(iso);
+      return d.toLocaleDateString('es-CL') + ' ' + d.toLocaleTimeString('es-CL', { hour: '2-digit', minute:'2-digit' });
+    }
+
+    function buildCard(codeData) {
+      const appName = APPS.find(a => a.id === codeData.appId)?.name || codeData.appId;
+      const isUsed = codeData.usedCount >= codeData.maxUses;
+      
+      // WhatsApp message logic
+      const rawPhone = codeData.clientPhone || '';
+      const phoneNum = rawPhone.replace(/\D/g, ''); 
+      const wpMsg = encodeURIComponent(`¡Hola ${codeData.clientName || ''}! 🚀\nAquí está tu código de acceso para *${appName}* (${codeData.planId} por ${codeData.durationMonths} meses):\n\n*${codeData.code}*\n\n¡Que lo disfrutes!`);
+      const wpLink = `https://wa.me/${phoneNum}?text=${wpMsg}`;
+
+      const wpRenewalMsg = encodeURIComponent(`¡Hola ${codeData.clientName || ''}! 👋\nTe recordamos que tu membresía de *${appName}* está próxima a vencer.\n\nPara evitar interrupciones en el servicio, te invitamos a renovar tu plan.\n\n¡Quedamos atentos a tus comentarios!`);
+      const wpRenewalLink = `https://wa.me/${phoneNum}?text=${wpRenewalMsg}`;
+
+      // Expiration logic
+      const createdAt = new Date(codeData.createdAt);
+      const expiresAt = new Date(createdAt);
+      expiresAt.setMonth(expiresAt.getMonth() + codeData.durationMonths);
+      
+      const now = new Date();
+      const diffTime = expiresAt - now;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      let alertBadge = '';
+      let renewalBadge = '';
+      
+      if (diffDays <= 0) {
+        alertBadge = '<span class="text-[10px] font-bold text-red-700 bg-red-100 px-2 py-0.5 rounded-full uppercase">Vencido</span>';
+      } else if (diffDays <= 30) {
+        alertBadge = `<span class="text-[10px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full uppercase">Vence en ${diffDays} días</span>`;
+      }
+      
+      if (diffDays > 0 && diffDays <= 15) {
+        renewalBadge = '<span class="text-[10px] font-bold text-purple-700 bg-purple-100 px-2 py-0.5 rounded-full uppercase">Enviar Renovación</span>';
+      }
+
+      return `
+        <div class="bg-white p-5 rounded-2xl border ${isUsed ? 'border-slate-200 opacity-60' : 'border-blue-100 shadow-sm hover:shadow-md'} transition-shadow relative overflow-hidden group">
+          <div class="absolute top-0 left-0 w-1.5 h-full ${isUsed ? 'bg-slate-300' : 'bg-emerald-500'}"></div>
+          
+          <div class="flex justify-between items-start mb-4">
+            <div class="flex flex-col gap-1">
+              <div class="text-[11px] font-bold text-slate-500 uppercase tracking-widest">${appName}</div>
+              <div class="text-base font-black text-slate-800">${codeData.clientName || 'Cliente Anónimo'}</div>
+              <div class="flex flex-col gap-0.5 text-xs font-semibold text-slate-500">
+                <span class="text-slate-700">RUT: ${codeData.rutClient || '-'}</span>
+                <span class="text-slate-700">Tel: ${codeData.clientPhone || '-'}</span>
+                <span class="text-slate-700">Mail: ${codeData.clientEmail || '-'}</span>
+                <span>Ciudad: ${codeData.clientCity || '-'}</span>
+              </div>
+              <div class="flex gap-2 mt-1">
+                ${alertBadge}
+                ${renewalBadge}
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="text-[11px] font-bold ${isUsed ? 'text-slate-500 bg-slate-100' : 'text-emerald-700 bg-emerald-100'} px-2.5 py-1.5 rounded-full inline-block uppercase tracking-wider mb-1">
+                ${isUsed ? 'USADO / INACTIVO' : 'ACTIVO'}
+              </div>
+              <div class="text-xs font-bold text-slate-600">${codeData.planId} • ${codeData.durationMonths} Meses</div>
+              <div class="text-[10px] font-medium text-slate-400 mt-1">Emitido: ${formatDate(codeData.createdAt)}</div>
+              <div class="text-[10px] font-medium text-slate-500">Vence: ${formatDate(expiresAt)}</div>
+            </div>
+          </div>
+
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-2.5 flex items-center justify-between gap-2">
+            <code class="text-lg font-black ${isUsed ? 'text-slate-400 line-through' : 'text-slate-800'} tracking-wider font-mono pl-2">${codeData.code}</code>
+            
+            <div class="flex items-center gap-2">
+              <button onclick="copyToClipboard(this, '${codeData.code}')" class="p-2.5 bg-white hover:bg-slate-200 text-slate-500 shadow-sm border border-slate-200 rounded-xl transition-colors font-semibold text-sm flex items-center gap-1" title="Copiar código">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              </button>
+              
+              <a href="${wpLink}" target="_blank" class="p-2.5 bg-[#25D366] hover:bg-[#128C7E] text-white shadow-sm rounded-xl transition-colors font-bold text-sm flex items-center gap-1.5" title="Enviar bienvenida">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                Enviar
+              </a>
+
+              <a href="${wpRenewalLink}" target="_blank" class="p-2.5 bg-[#0284c7] hover:bg-[#0369a1] text-white shadow-sm rounded-xl transition-colors font-bold text-sm flex items-center gap-1.5" title="Enviar recordatorio de renovación">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                Recordar
+              </a>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function copyToClipboard(btn, text) {
+      navigator.clipboard.writeText(text);
+      const originalSvg = btn.innerHTML;
+      btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-600"><polyline points="20 6 9 17 4 12"/></svg>';
+      btn.classList.replace('text-slate-500', 'text-emerald-600');
+      btn.classList.add('bg-emerald-50', 'border-emerald-200');
+      setTimeout(() => {
+        btn.innerHTML = originalSvg;
+        btn.classList.remove('bg-emerald-50', 'border-emerald-200');
+        btn.classList.replace('text-emerald-600', 'text-slate-500');
+      }, 2000);
+    }
+
+    function downloadExcel() {
+      if (!currentCodes || currentCodes.length === 0) {
+        alert("No hay datos para descargar");
+        return;
+      }
+      
+      const headers = ["Código", "App", "Cliente", "RUT", "Teléfono", "Email", "Ciudad", "Plan", "Duración (Meses)", "Estado", "Emitido", "Vence"];
+      const rows = currentCodes.map(code => {
+        const appName = APPS.find(a => a.id === code.appId)?.name || code.appId;
+        const isUsed = code.usedCount >= code.maxUses;
+        const state = isUsed ? "Inactivo" : "Activo";
+        const createdAt = new Date(code.createdAt);
+        const expiresAt = new Date(createdAt);
+        expiresAt.setMonth(expiresAt.getMonth() + code.durationMonths);
+        
+        return [
+          code.code,
+          appName,
+          code.clientName || "-",
+          code.rutClient || "-",
+          code.clientPhone || "-",
+          code.clientEmail || "-",
+          code.clientCity || "-",
+          code.planId,
+          code.durationMonths,
+          state,
+          createdAt.toLocaleDateString('es-CL'),
+          expiresAt.toLocaleDateString('es-CL')
+        ];
+      });
+      
+      let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; // BOM para Excel
+      csvContent += headers.join(";") + "\n";
+      rows.forEach(row => {
+        csvContent += row.map(val => `"${val}"`).join(";") + "\n";
+      });
+      
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `Historial_Licencias_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // Iniciar
+    fetchHistory();
+  </script>
+</body>
+</html>

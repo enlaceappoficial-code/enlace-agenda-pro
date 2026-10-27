@@ -1,0 +1,145 @@
+/* ============================================================
+   ENLACE PELUQUERÍA — DARK LUXURY CINEMATIC THEME
+   Concepto: Lujo moderno. Barbería premium. Oscuro editorial.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+[data-theme="peluqueria"],
+:root[data-theme="peluqueria"] {
+
+  /* ─── PALETA CORE ─── */
+  --primary:          #C89B3C;
+  --primary-hover:    #D8AC52;
+  --primary-active:   #B78628;
+  --primary-glow:     rgba(200, 155, 60, 0.18);
+  --primary-subtle:   rgba(200, 155, 60, 0.08);
+
+  /* ─── FONDOS ─── */
+  --background:       #0E0E11;
+  --card-bg:          #18181C;
+  --card-bg-2:        #1F1F24;
+  --overlay:          rgba(14, 14, 17, 0.85);
+
+  /* ─── BORDES ─── */
+  --border:           rgba(245, 242, 235, 0.07);
+  --border-strong:    rgba(200, 155, 60, 0.22);
+
+  /* ─── TEXTOS ─── */
+  --text-main:        #F5F2EB;
+  --text-muted:       #A1A1AA;
+  --text-soft:        #71717A;
+
+  /* ─── SEMÁNTICOS (usados por index.css y componentes) ─── */
+  --bg:               var(--background);
+  --card:             var(--card-bg);
+  --hover:            #232328;
+  --text:             var(--text-main);
+  --muted:            var(--text-muted);
+  --accent:           var(--primary);
+  --accent-dark:      var(--primary-active);
+  --nav-bg:           #111114;
+  --nav-border:       rgba(245, 242, 235, 0.06);
+  --btn-secondary:    rgba(245, 242, 235, 0.06);
+  --btn-secondary-text: var(--text-main);
+  --red:              #F87171;
+  --orange:           #FB923C;
+  --green:            #4ADE80;
+
+  /* ─── TIPOGRAFÍA ─── */
+  --font-heading:     'Playfair Display', Georgia, serif;
+  --font-body:        'Inter', system-ui, sans-serif;
+  --fw-heading:       700;
+  --ls-heading:       -0.02em;
+
+  /* ─── RADIOS ─── */
+  --radius-xl:        24px;
+  --radius-lg:        16px;
+  --radius-md:        10px;
+  --radius-sm:        6px;
+  --radius-xs:        4px;
+
+  /* ─── SOMBRAS — Cinematográficas, profundas, glow dorado ─── */
+  --shadow-card:      0 25px 50px -12px rgba(0,0,0,0.9),
+                      0 0 0 0.5px rgba(245,242,235,0.05),
+                      0 0 60px -20px rgba(200,155,60,0.04);
+  --shadow-popover:   0 30px 60px -15px rgba(0,0,0,0.95),
+                      0 0 0 0.5px rgba(200,155,60,0.12);
+  --shadow-glow:      0 0 28px rgba(200,155,60,0.30),
+                      0 0 60px rgba(200,155,60,0.10);
+  --shadow-btn:       0 4px 24px rgba(200,155,60,0.35);
+  --shadow-inset:     inset 0 1px 0 rgba(255,255,255,0.04);
+
+  /* ─── EFECTOS ─── */
+  --backdrop-blur:    blur(14px);
+
+  /* ─── MOTION — Lento, elegante, cinematográfico ─── */
+  --transition-speed: 360ms;
+  --motion-ease:      cubic-bezier(0.16, 1, 0.3, 1);
+  --transition:       all 360ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ─── AGENDA / CALENDARIO ─── */
+  --slot-selected-bg:     rgba(200,155,60,0.15);
+  --slot-selected-border: #C89B3C;
+  --slot-selected-glow:   0 0 20px rgba(200,155,60,0.25);
+
+  /* ─── IDENTIDAD ─── */
+  --app-name:         "BARBERÍA";
+  --app-label-color:  var(--primary);
+}
+
+/* ─── APLICAR FUENTES AL BODY CUANDO EL TEMA ESTÁ ACTIVO ─── */
+[data-theme="peluqueria"] body {
+  font-family: var(--font-body);
+}
+
+[data-theme="peluqueria"] h1,
+[data-theme="peluqueria"] h2,
+[data-theme="peluqueria"] h3 {
+  font-family: var(--font-heading);
+  font-weight: var(--fw-heading);
+  letter-spacing: var(--ls-heading);
+}
+
+/* ─── SCROLLBAR TEMÁTICA ─── */
+[data-theme="peluqueria"] ::-webkit-scrollbar {
+  width: 3px;
+  height: 3px;
+}
+[data-theme="peluqueria"] ::-webkit-scrollbar-track {
+  background: transparent;
+}
+[data-theme="peluqueria"] ::-webkit-scrollbar-thumb {
+  background: rgba(200, 155, 60, 0.25);
+  border-radius: 999px;
+}
+
+/* ─── GLASSMORPHISM OSCURO PARA MODALES Y OVERLAYS ─── */
+[data-theme="peluqueria"] .glass {
+  background: rgba(24, 24, 28, 0.75);
+  backdrop-filter: var(--backdrop-blur);
+  -webkit-backdrop-filter: var(--backdrop-blur);
+  border: 0.5px solid var(--border);
+  box-shadow: var(--shadow-card);
+}
+
+/* ─── GLOW EN EL BOTÓN PRIMARY ─── */
+[data-theme="peluqueria"] .btn-primary {
+  background: linear-gradient(135deg, #C89B3C 0%, #D8AC52 50%, #C89B3C 100%);
+  background-size: 200% 200%;
+  background-position: 0% 50%;
+  box-shadow: var(--shadow-btn);
+  color: #0E0E11;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  transition: var(--transition);
+}
+[data-theme="peluqueria"] .btn-primary:hover {
+  background-position: 100% 50%;
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-1px);
+}
+[data-theme="peluqueria"] .btn-primary:active {
+  transform: translateY(0px) scale(0.98);
+  box-shadow: var(--shadow-btn);
+}

@@ -1,0 +1,103 @@
+/* ============================================================
+   ENLACE OFICIAL — CORPORATE NAVY & VIBRANT ORANGE THEME
+   Concepto: Identidad oficial Red Enlace. Profesional, moderno,
+   alto contraste con azul marino profundo y naranja neón enérgico.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+[data-theme="enlace"],
+:root[data-theme="enlace"] {
+
+  /* ─── PALETA CORE ─── */
+  --primary:          #F5A020;            /* Naranja Oficial Enlace */
+  --primary-hover:    #FFAE33;
+  --primary-active:   #E08E15;
+  --primary-glow:     rgba(245, 160, 32, 0.25);
+  --primary-subtle:   rgba(245, 160, 32, 0.10);
+
+  /* ─── FONDOS ─── */
+  --background:       #071A3A;            /* Azul Marino Profundo Enlace */
+  --card-bg:          #0D2550;            /* Azul Noche Card */
+  --card-bg-2:        #12326B;            /* Azul Card Elevada */
+  --overlay:          rgba(7, 26, 58, 0.90);
+
+  /* ─── BORDES ─── */
+  --border:           rgba(255, 255, 255, 0.10);
+  --border-strong:    rgba(245, 160, 32, 0.35);
+
+  /* ─── TEXTOS ─── */
+  --text-main:        #F8FAFC;
+  --text-muted:       #94A3B8;
+  --text-soft:        #64748B;
+
+  /* ─── SEMÁNTICOS (usados por index.css y componentes) ─── */
+  --bg:               var(--background);
+  --card:             var(--card-bg);
+  --hover:            #12326B;
+  --text:             var(--text-main);
+  --muted:            var(--text-muted);
+  --accent:           #F5A020;            /* Naranja Enlace */
+  --accent-blue:      #2563EB;            /* Azul Enlace */
+  --accent-dark:      #E08E15;
+  --nav-bg:           #061633;
+  --nav-border:       rgba(255, 255, 255, 0.08);
+  --btn-secondary:    rgba(255, 255, 255, 0.08);
+  --btn-secondary-text: var(--text-main);
+  --red:              #F87171;
+  --orange:           #F5A020;
+  --green:            #4ADE80;
+
+  /* ─── TIPOGRAFÍA ─── */
+  --font-heading:     'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-body:        'Inter', system-ui, sans-serif;
+  --fw-heading:       700;
+  --ls-heading:       -0.02em;
+
+  /* ─── RADIOS ─── */
+  --radius-xl:        20px;
+  --radius-lg:        14px;
+  --radius-md:        10px;
+  --radius-sm:        6px;
+  --radius-xs:        4px;
+
+  /* ─── SOMBRAS — Azul profundo con resplandor naranja y azul ─── */
+  --shadow-card:      0 20px 40px -10px rgba(0, 8, 24, 0.7),
+                      0 0 0 1px rgba(255, 255, 255, 0.08),
+                      0 0 40px -15px rgba(37, 99, 235, 0.15);
+  --shadow-popover:   0 25px 50px -12px rgba(0, 8, 24, 0.9),
+                      0 0 0 1px rgba(245, 160, 32, 0.25);
+  --shadow-glow:      0 0 24px rgba(245, 160, 32, 0.35),
+                      0 0 50px rgba(37, 99, 235, 0.20);
+  --shadow-btn:       0 4px 20px rgba(245, 160, 32, 0.40);
+  --shadow-inset:     inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+  /* ─── EFECTOS ─── */
+  --backdrop-blur:    blur(14px);
+
+  /* ─── MOTION ─── */
+  --transition-speed: 300ms;
+  --motion-ease:      cubic-bezier(0.16, 1, 0.3, 1);
+  --transition:       all 300ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ─── AGENDA / CALENDARIO ─── */
+  --slot-selected-bg:     rgba(245, 160, 32, 0.18);
+  --slot-selected-border: #F5A020;
+  --slot-selected-glow:   0 0 20px rgba(245, 160, 32, 0.30);
+
+  /* ─── IDENTIDAD ─── */
+  --app-name:         "BARBERÍA";
+  --app-label-color:  #F5A020;
+}
+
+[data-theme="enlace"] body {
+  font-family: var(--font-body);
+}
+
+[data-theme="enlace"] h1,
+[data-theme="enlace"] h2,
+[data-theme="enlace"] h3 {
+  font-family: var(--font-heading);
+  font-weight: var(--fw-heading);
+  letter-spacing: var(--ls-heading);
+}

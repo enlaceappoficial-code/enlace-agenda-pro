@@ -1,0 +1,610 @@
+import { useEffect, useState } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
+import { apiGet, apiPost } from '../lib/api'
+
+export default function Booking() {
+  const { slug } = useParams()
+  const nav = useNavigate()
+  const [shop, setShop] = useState(null)
+  const [services, setServices] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  const [step, setStep] = useState(1) // 1: Servicio, 2: Fecha, 3: Hora, 4: Datos, 5: Pago (Si aplica)
+  const [selService, setSelService] = useState(null)
+  const [selDate, setSelDate] = useState(null)
+  const [selTime, setSelTime] = useState(null)
+  const [availableSlots, setAvailableSlots] = useState([])
+  const [loadingSlots, setLoadingSlots] = useState(false)
+
+  const [form, setForm] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    notes: ''
+  })
+  const [receiptBase64, setReceiptBase64] = useState('')
+  const [uploadingReceipt, setUploadingReceipt] = useState(false)
+  const [copiedField, setCopiedField] = useState(null)
+  const handleCopy = (text, fieldName) => {
+    navigator.clipboard.writeText(text)
+    setCopiedField(fieldName)
+    setTimeout(() => setCopiedField(null), 1500)
+  }
+
+  useEffect(() => {
+    Promise.all([
+      apiGet(`/public/shops/${slug}`),
+      apiGet(`/public/shops/${slug}/services`)
+    ]).then(([s, servs]) => {
+      setShop(s.shop)
+      setServices(servs.services)
+    })
+    .catch(() => {})
+    .finally(() => setLoading(false))
+  }, [slug])
+
+  useEffect(() => {
+    if (step === 3 && selDate && selService) {
+      setLoadingSlots(true)
+      apiGet(`/public/shops/${slug}/availability?date=${selDate.iso}&serviceId=${selService.id}`)
+        .then(r => setAvailableSlots(r.slots))
+        .catch(() => {})
+        .finally(() => setLoadingSlots(false))
+    }
+  }, [step, selDate, selService, slug])
+
+  const nextStep = () => setStep(step + 1)
+  const prevStep = () => setStep(step - 1)
+
+  const handleConfirm = async () => {
+    try {
+      const res = await apiPost(`/public/shops/${slug}/appointments`, {
+        serviceId: selService.id,
+        date: selDate.iso,
+        time: selTime,
+        name: form.name,
+        phone: form.phone,
+        email: form.email,
+        notes: form.notes,
+        depositReceiptUrl: receiptBase64 || null
+      })
+      nav(`/b/${slug}/confirm/${res.appointmentId}`)
+    } catch (e) {
+      if (e.data?.error === 'SLOT_TAKEN') {
+        alert('💈 ¡Upa! Al parecer este horario acaba de ser reservado por otro cliente. Por favor, selecciona una hora diferente para dejarte impecable. ✂️')
+      } else {
+        alert('Ocurrió un inconveniente al procesar tu reserva. Por favor, intenta nuevamente.')
+      }
+    }
+  }
+
+  const handleReceiptUpload = (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    setUploadingReceipt(true)
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      const img = new Image()
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        const MAX_WIDTH = 600
+        const MAX_HEIGHT = 600
+        let width = img.width
+        let height = img.height
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width
+            width = MAX_WIDTH
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height
+            height = MAX_HEIGHT
+          }
+        }
+
+        canvas.width = width
+        canvas.height = height
+        const ctx = canvas.getContext('2d')
+        ctx.drawImage(img, 0, 0, width, height)
+        const base64 = canvas.toDataURL('image/jpeg', 0.75)
+        setReceiptBase64(base64)
+        setUploadingReceipt(false)
+      }
+      img.src = ev.target.result
+    }
+    reader.readAsDataURL(file)
+  }
+
+  if (loading) return <div style={{ padding: 40, textAlign: 'center', color: 'var(--muted)' }}>Cargando...</div>
+  if (!shop) return <div style={{ padding: 40, textAlign: 'center' }}>Negocio no encontrado</div>
+
+  // Dates generator (Next 28 days, filtering activeDays)
+  const availableDates = []
+  const today = new Date()
+  const activeDays = Array.isArray(shop.activeDays) ? shop.activeDays : []
+  for (let i = 0; i < 28; i++) {
+    const d = new Date()
+    d.setDate(today.getDate() + i)
+    if (activeDays.includes(d.getDay())) {
+      availableDates.push({
+        iso: d.toISOString().split('T')[0],
+        day: d.getDate(),
+        month: d.toLocaleDateString('es-ES', { month: 'short' }),
+        weekday: d.toLocaleDateString('es-ES', { weekday: 'short' })
+      })
+    }
+    if (availableDates.length >= 16) break
+  }
+
+  const headerStyle = {
+    background: 'linear-gradient(135deg, #2563eb, #1a4fd8)',
+    padding: '20px 16px', color: 'white', textAlign: 'center'
+  }
+
+  // Experience Gating Logic based on Barber settings
+  const isMandatoryDeposit = shop.depositEnabled && selService?.depositRequired
+  const isSuggestedPrepayment = shop.prepaymentEnabled && !isMandatoryDeposit
+  const hasStep5 = isMandatoryDeposit || isSuggestedPrepayment
+
+  return (
+    <div style={{ minHeight: '100%', background: 'var(--bg)', display: 'flex', flexDirection: 'column' }}>
+      
+      {/* HEADER */}
+      <div style={headerStyle}>
+        {shop.logoUrl ? (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{ width: 80, height: 80, borderRadius: '50%', overflow: 'hidden', background: 'white', marginBottom: 10, border: '2px solid rgba(255,255,255,0.2)' }}>
+              <img src={shop.logoUrl} alt={shop.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            </div>
+            <div style={{ fontSize: 22, fontWeight: 800, color: 'white', letterSpacing: '-0.5px' }}>{shop.name}</div>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{ width: 60, height: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 4 }}>
+               <img src="/logo-icon.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+            </div>
+            <div>
+              <span style={{ fontSize: 20, fontWeight: 800, color: 'white', letterSpacing: '-0.5px' }}>ENLACE</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: -4 }}>
+              <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.7)' }}>
+                {shop.businessType === 'peluqueria' ? 'PELUQUERÍA' : 'BARBERÍA'}
+              </span>
+              <span style={{ fontSize: 10, fontWeight: 800, color: 'var(--red)' }}>PRO</span>
+            </div>
+            <div style={{ fontSize: 13, fontWeight: 600, marginTop: 8, opacity: 0.9 }}>{shop.name}</div>
+          </div>
+        )}
+      </div>
+
+      {/* PROGRESS BAR */}
+      <div style={{ background: 'rgba(37, 99, 235, 0.1)', height: 4, display: 'flex' }}>
+        <div style={{ background: 'var(--accent)', width: `${(step / (hasStep5 ? 5 : 4)) * 100}%`, transition: 'width 0.3s' }} />
+      </div>
+
+      <div style={{ flex: 1, padding: 16 }}>
+
+        {/* STEP 1: SERVICIOS */}
+        {step === 1 && (
+          <div>
+            <h2 style={{ fontSize: 18, fontWeight: 800, marginBottom: 16 }}>1. Elige un servicio</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {services.map(s => (
+                <div 
+                  key={s.id} 
+                  onClick={() => { setSelService(s); nextStep() }}
+                  style={{ background: 'var(--card)', padding: 16, borderRadius: 14, border: '0.5px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
+                >
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 800, fontSize: 16 }}>{s.name}</div>
+                    <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>{s.description || `${s.durationMin} min`}</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent)', marginTop: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span>⏱️ {s.durationMin} min</span>
+                      {shop.depositEnabled && s.depositRequired && (
+                        <span style={{ background: 'rgba(245, 160, 32, 0.1)', color: 'var(--orange)', padding: '2px 6px', borderRadius: 6, fontSize: 10, fontWeight: 800 }}>
+                          ⚡ Requiere Seña
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div style={{ fontWeight: 800, fontSize: 18 }}>${s.price.toLocaleString('es-CL')}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* STEP 2: FECHA */}
+        {step === 2 && (
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+              <button onClick={prevStep} style={{ border: 'none', background: 'transparent', fontSize: 20, cursor: 'pointer' }}>←</button>
+              <h2 style={{ fontSize: 18, fontWeight: 800 }}>2. Selecciona el día</h2>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+              {availableDates.map(d => (
+                <button 
+                  key={d.iso}
+                  onClick={() => { setSelDate(d); nextStep() }}
+                  style={{
+                    background: selDate?.iso === d.iso ? 'var(--accent)' : 'white',
+                    color: selDate?.iso === d.iso ? 'white' : 'var(--text)',
+                    border: '0.5px solid var(--border)', borderRadius: 12, padding: '12px 4px',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, cursor: 'pointer'
+                  }}
+                >
+                  <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase' }}>{d.weekday}</span>
+                  <span style={{ fontSize: 18, fontWeight: 800 }}>{d.day}</span>
+                  <span style={{ fontSize: 10, fontWeight: 700 }}>{d.month}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* STEP 3: HORA */}
+        {step === 3 && (
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+              <button onClick={prevStep} style={{ border: 'none', background: 'transparent', fontSize: 20, cursor: 'pointer' }}>←</button>
+              <h2 style={{ fontSize: 18, fontWeight: 800 }}>3. Elige la hora</h2>
+            </div>
+            {loadingSlots ? (
+              <div style={{ textAlign: 'center', padding: 20, color: 'var(--muted)' }}>Cargando horas...</div>
+            ) : availableSlots.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: 20, color: 'var(--muted)' }}>No hay horas disponibles para este día</div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+                {availableSlots.map(t => (
+                  <button 
+                    key={t}
+                    onClick={() => { setSelTime(t); nextStep() }}
+                    style={{
+                      background: selTime === t ? 'var(--accent)' : 'white',
+                      color: selTime === t ? 'white' : 'var(--text)',
+                      border: '0.5px solid var(--border)', borderRadius: 12, padding: 14,
+                      fontWeight: 800, fontSize: 14, cursor: 'pointer'
+                    }}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* STEP 4: DATOS */}
+        {step === 4 && (
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+              <button onClick={prevStep} style={{ border: 'none', background: 'transparent', fontSize: 20, cursor: 'pointer' }}>←</button>
+              <h2 style={{ fontSize: 18, fontWeight: 800 }}>4. Tus datos</h2>
+            </div>
+
+            <div style={{ background: 'var(--card)', borderRadius: 14, border: '0.5px solid var(--border)', padding: 16, marginBottom: 20 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--muted)', marginBottom: 8 }}>RESUMEN</div>
+              <div style={{ fontWeight: 800, fontSize: 16 }}>{selService.name}</div>
+              <div style={{ fontSize: 14, color: 'var(--text)', marginTop: 4 }}>
+                {new Date(selDate.iso + 'T12:00:00').toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
+              </div>
+              <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--accent)', marginTop: 4 }}>{selTime} hrs</div>
+              
+              {isMandatoryDeposit && (
+                <div style={{ background: 'rgba(245, 160, 32, 0.08)', border: '1px solid var(--orange)', color: 'var(--orange)', padding: 8, borderRadius: 8, fontSize: 11, fontWeight: 800, marginTop: 10, textAlign: 'center' }}>
+                  ⚡ Requiere Seña de ${selService.depositAmount.toLocaleString('es-CL')} para agendar
+                </div>
+              )}
+              {isSuggestedPrepayment && (
+                <div style={{ background: 'rgba(59, 130, 246, 0.08)', border: '1px solid var(--accent)', color: 'var(--accent)', padding: 8, borderRadius: 8, fontSize: 11, fontWeight: 800, marginTop: 10, textAlign: 'center' }}>
+                  💎 Sugerencia: Puedes pagar tu servicio por adelantado opcionalmente
+                </div>
+              )}
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <input 
+                placeholder="Nombre completo *" 
+                style={{ padding: 16, borderRadius: 12, border: '1px solid var(--border)', fontSize: 15 }}
+                value={form.name}
+                onChange={e => setForm({ ...form, name: e.target.value })}
+              />
+              <input 
+                placeholder="WhatsApp (ej: 56912345678) *" 
+                style={{ padding: 16, borderRadius: 12, border: '1px solid var(--border)', fontSize: 15 }}
+                value={form.phone}
+                onChange={e => setForm({ ...form, phone: e.target.value })}
+              />
+              <input 
+                placeholder="Correo electrónico (opcional)" 
+                style={{ padding: 16, borderRadius: 12, border: '1px solid var(--border)', fontSize: 15 }}
+                value={form.email}
+                onChange={e => setForm({ ...form, email: e.target.value })}
+              />
+              <textarea 
+                placeholder="Notas o comentarios (opcional)" 
+                style={{ padding: 16, borderRadius: 12, border: '1px solid var(--border)', fontSize: 15, minHeight: 80 }}
+                value={form.notes}
+                onChange={e => setForm({ ...form, notes: e.target.value })}
+              />
+
+              {/* OPTION C: MOSTRAR DATOS POST-PAGO RAPIDO */}
+              {shop.fastPaymentEnabled && (
+                <div style={{ 
+                  background: 'rgba(16, 185, 129, 0.05)', 
+                  border: '1px dashed var(--green)', 
+                  padding: 14, 
+                  borderRadius: 14, 
+                  fontSize: 12, 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  gap: 6,
+                  marginTop: 4,
+                  marginBottom: 4
+                }}>
+                  <div style={{ fontWeight: 800, color: 'var(--green)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                    📱 Pago Rápido Post-Servicio Sugerido
+                  </div>
+                  <p style={{ fontSize: 11, color: 'var(--muted)', margin: 0, lineHeight: 1.4 }}>
+                    Para que tu experiencia al salir de tu corte sea súper rápida, te sugerimos guardar nuestra cuenta para transferencias en tu app del banco:
+                  </p>
+                  <div style={{ background: 'var(--card)', padding: 12, borderRadius: 12, fontSize: 11, fontWeight: 700, display: 'flex', flexDirection: 'column', gap: 6, border: '0.5px solid var(--border)' }}>
+                    <div>🏦 Banco: <strong>{shop.barberBankName}</strong></div>
+                    
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span>💳 Cuenta: <strong>{shop.barberBankAccountType} N° {shop.barberBankAccountNumber}</strong></span>
+                      <button 
+                        onClick={() => handleCopy(shop.barberBankAccountNumber, 'account-fast')}
+                        style={{ border: 'none', background: 'var(--accent)', color: 'white', fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 4, cursor: 'pointer' }}
+                      >
+                        {copiedField === 'account-fast' ? '✓' : '📋'}
+                      </button>
+                    </div>
+                    
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span>🆔 RUT: <strong>{shop.barberBankRut}</strong></span>
+                      <button 
+                        onClick={() => handleCopy(shop.barberBankRut, 'rut-fast')}
+                        style={{ border: 'none', background: 'var(--accent)', color: 'white', fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 4, cursor: 'pointer' }}
+                      >
+                        {copiedField === 'rut-fast' ? '✓' : '📋'}
+                      </button>
+                    </div>
+                    
+                    <div>👤 Nombre: <strong>{shop.barberBankOwnerName}</strong></div>
+                  </div>
+                </div>
+              )}
+
+              <div style={{ background: '#f3f4f6', padding: 12, borderRadius: 10, fontSize: 12, color: 'var(--muted)', lineHeight: 1.4 }}>
+                <strong>Política:</strong> {shop.cancellationPolicy}
+              </div>
+
+              <button 
+                onClick={() => {
+                  if (!form.name.trim()) {
+                    alert('👤 ¡Opa! Olvidaste ingresar tu nombre completo para registrar tu cita.')
+                    return
+                  }
+                  if (!form.phone.trim()) {
+                    alert('📱 Por favor, ingresa tu número de WhatsApp para enviarte la confirmación.')
+                    return
+                  }
+                  if (hasStep5) {
+                    nextStep()
+                  } else {
+                    handleConfirm()
+                  }
+                }}
+                style={{ 
+                  marginTop: 10, padding: 18, borderRadius: 14, border: 'none', 
+                  background: 'var(--accent)', 
+                  color: 'white', fontWeight: 800, fontSize: 16, cursor: 'pointer'
+                }}
+              >
+                {hasStep5 ? 'Siguiente ➔' : 'Confirmar Reserva'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP 5: DEPOSITO (SEÑA OBLIGATORIA O PAGO ANTICIPADO SUGERIDO) */}
+        {step === 5 && hasStep5 && (
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+              <button onClick={prevStep} style={{ border: 'none', background: 'transparent', fontSize: 20, cursor: 'pointer' }}>←</button>
+              <h2 style={{ fontSize: 18, fontWeight: 800 }}>
+                {isMandatoryDeposit ? '⚡ 5. Depositar Seña' : '💎 5. Pago Anticipado'}
+              </h2>
+            </div>
+
+            <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 16 }}>
+              {isMandatoryDeposit 
+                ? 'Transfiere el monto de la seña obligatoria para asegurar tu hora. Tu reserva quedará pre-confirmada al adjuntar la captura.'
+                : 'Si deseas ahorrar tiempo en tu cita, puedes realizar transferencia por adelantado y adjuntar tu comprobante ahora.'}
+            </p>
+
+            <div style={{ background: 'var(--card)', borderRadius: 16, border: '1.5px solid var(--orange)', padding: 16, marginBottom: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
+              
+              {isMandatoryDeposit ? (
+                <>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--muted)', letterSpacing: '0.5px' }}>1. SEÑA MÍNIMA REQUERIDA</span>
+                      <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--orange)', marginTop: 2 }}>${selService.depositAmount.toLocaleString('es-CL')}</div>
+                    </div>
+                    <span style={{ fontSize: 28 }}>🛡️</span>
+                  </div>
+                  <div style={{ borderTop: '0.5px solid var(--border)', paddingTop: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--muted)', letterSpacing: '0.5px' }}>2. VALOR TOTAL DEL SERVICIO (OPCIONAL)</span>
+                      <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--accent)', marginTop: 2 }}>${selService.price.toLocaleString('es-CL')}</div>
+                    </div>
+                    <span style={{ fontSize: 20 }}>💎</span>
+                  </div>
+                </>
+              ) : (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--muted)', letterSpacing: '0.5px' }}>VALOR TOTAL DEL SERVICIO</span>
+                    <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--accent)', marginTop: 2 }}>${selService.price.toLocaleString('es-CL')}</div>
+                  </div>
+                  <span style={{ fontSize: 28 }}>💎</span>
+                </div>
+              )}
+
+              <p style={{ background: 'rgba(37, 99, 235, 0.05)', padding: 10, borderRadius: 10, fontSize: 11, color: 'var(--text)', lineHeight: 1.4, margin: 0, border: '0.5px solid rgba(37, 99, 235, 0.15)' }}>
+                {isMandatoryDeposit ? (
+                  <span>💡 <strong>¿Eres cliente habitual?</strong> Puedes transferir la seña mínima o el valor completo de <strong>${selService.price.toLocaleString('es-CL')}</strong> para ahorrar tiempo.</span>
+                ) : (
+                  <span>💡 <strong>Pago opcional:</strong> Puedes transferir por adelantado ahora o pagar presencialmente al terminar tu servicio. Adjunta tu comprobante solo si decides transferir ahora.</span>
+                )}
+              </p>
+            </div>
+
+            {/* BARBER BANK ACCOUNT DETAILS */}
+            <div style={{ background: 'var(--card)', borderRadius: 16, border: '0.5px solid var(--border)', padding: 16, marginBottom: 20, display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--muted)', borderBottom: '1px solid var(--border)', paddingBottom: 6, marginBottom: 4 }}>DATOS DE TRANSFERENCIA</div>
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 13 }}>
+                <span style={{ color: 'var(--muted)' }}>Banco:</span>
+                <span style={{ fontWeight: 700 }}>{shop.barberBankName}</span>
+              </div>
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 13 }}>
+                <span style={{ color: 'var(--muted)' }}>Tipo Cuenta:</span>
+                <span style={{ fontWeight: 700 }}>{shop.barberBankAccountType}</span>
+              </div>
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 13, background: 'rgba(37, 99, 235, 0.03)', padding: '6px 10px', borderRadius: 10, border: '0.5px solid rgba(37, 99, 235, 0.1)' }}>
+                <span style={{ color: 'var(--muted)' }}>N° Cuenta:</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontWeight: 700, fontFamily: 'monospace' }}>{shop.barberBankAccountNumber}</span>
+                  <button 
+                    onClick={() => handleCopy(shop.barberBankAccountNumber, 'account')}
+                    style={{ border: 'none', background: 'var(--accent)', color: 'white', fontSize: 10, fontWeight: 800, padding: '4px 8px', borderRadius: 6, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}
+                  >
+                    {copiedField === 'account' ? '¡Copiado! ✓' : '📋 Copiar'}
+                  </button>
+                </div>
+              </div>
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 13, background: 'rgba(37, 99, 235, 0.03)', padding: '6px 10px', borderRadius: 10, border: '0.5px solid rgba(37, 99, 235, 0.1)' }}>
+                <span style={{ color: 'var(--muted)' }}>RUT:</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontWeight: 700 }}>{shop.barberBankRut}</span>
+                  <button 
+                    onClick={() => handleCopy(shop.barberBankRut, 'rut')}
+                    style={{ border: 'none', background: 'var(--accent)', color: 'white', fontSize: 10, fontWeight: 800, padding: '4px 8px', borderRadius: 6, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}
+                  >
+                    {copiedField === 'rut' ? '¡Copiado! ✓' : '📋 Copiar'}
+                  </button>
+                </div>
+              </div>
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 13 }}>
+                <span style={{ color: 'var(--muted)' }}>Nombre:</span>
+                <span style={{ fontWeight: 700 }}>{shop.barberBankOwnerName}</span>
+              </div>
+              
+              {shop.barberBankEmail && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 13, background: 'rgba(37, 99, 235, 0.03)', padding: '6px 10px', borderRadius: 10, border: '0.5px solid rgba(37, 99, 235, 0.1)' }}>
+                  <span style={{ color: 'var(--muted)' }}>Email:</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontWeight: 700 }}>{shop.barberBankEmail}</span>
+                    <button 
+                      onClick={() => handleCopy(shop.barberBankEmail, 'email')}
+                      style={{ border: 'none', background: 'var(--accent)', color: 'white', fontSize: 10, fontWeight: 800, padding: '4px 8px', borderRadius: 6, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}
+                    >
+                      {copiedField === 'email' ? '¡Copiado! ✓' : '📋 Copiar'}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* SCREENSHOT FILE UPLOADER */}
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ fontSize: 11, fontWeight: 800, color: 'var(--muted)', display: 'block', marginBottom: 6 }}>COMPROBANTE DE TRANSFERENCIA</label>
+              <div 
+                style={{ 
+                  borderRadius: 14, border: '2px dashed var(--border)', background: 'var(--card)', padding: 20, textAlign: 'center', cursor: 'pointer',
+                  position: 'relative', overflow: 'hidden', minHeight: 120, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'
+                }}
+                onClick={() => document.getElementById('receipt-upload').click()}
+              >
+                {receiptBase64 ? (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span style={{ fontSize: 24 }}>📄</span>
+                    <div style={{ textAlign: 'left' }}>
+                      <div style={{ fontWeight: 700, fontSize: 13, color: 'var(--green)' }}>¡Comprobante adjuntado!</div>
+                      <div style={{ fontSize: 10, color: 'var(--muted)' }}>Toca para cambiar la imagen</div>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <div style={{ fontSize: 28, marginBottom: 4 }}>📷</div>
+                    <div style={{ fontSize: 12, fontWeight: 800 }}>Subir captura de comprobante</div>
+                    <div style={{ fontSize: 10, color: 'var(--muted)', marginTop: 2 }}>Formatos: JPG, PNG, screenshot</div>
+                  </div>
+                )}
+                <input 
+                  id="receipt-upload" 
+                  type="file" 
+                  accept="image/*" 
+                  onChange={handleReceiptUpload} 
+                  style={{ display: 'none' }} 
+                />
+              </div>
+            </div>
+
+            <button 
+              onClick={() => {
+                if (uploadingReceipt) return
+                if (isMandatoryDeposit && !receiptBase64) {
+                  alert('📷 ¡Falta un detalle! Por favor, adjunta la captura de tu comprobante de transferencia para verificar tu seña obligatoria. ⚡')
+                  return
+                }
+                handleConfirm()
+              }}
+              style={{ 
+                width: '100%', padding: 18, borderRadius: 14, border: 'none', 
+                background: 'var(--accent)', 
+                color: 'white', fontWeight: 800, fontSize: 16, cursor: 'pointer'
+              }}
+            >
+              {uploadingReceipt ? 'Procesando captura...' : (isMandatoryDeposit ? 'Finalizar Reserva con Seña ✓' : 'Finalizar con Pago Anticipado ✓')}
+            </button>
+
+            {/* SKIP BUTTON FOR OPTIONAL PREPAYMENT (OPTION B) */}
+            {isSuggestedPrepayment && (
+              <button
+                onClick={handleConfirm}
+                style={{
+                  width: '100%', padding: 14, borderRadius: 14, border: '1px solid var(--border)',
+                  background: 'transparent', color: 'var(--text)', fontWeight: 700, fontSize: 14,
+                  cursor: 'pointer', marginTop: 10
+                }}
+              >
+                Omitir y Pagar en el Salón ➔
+              </button>
+            )}
+          </div>
+        )}
+
+      </div>
+      
+      {/* FOOTER WATERMARK */}
+      <div style={{ padding: 20, textAlign: 'center', opacity: 0.5, marginTop: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+        <img src="/enlace-logo.png" alt="Enlace" style={{ width: 16, height: 16, objectFit: 'contain' }} />
+        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text)' }}>
+          Funciona con Enlace {shop?.businessType === 'peluqueria' ? 'Peluquería' : 'Barbería'} Pro
+        </div>
+      </div>
+
+    </div>
+  )
+}

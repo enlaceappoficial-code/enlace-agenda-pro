@@ -1,0 +1,25 @@
+{
+  "name": "enlace-agenda-pro",
+  "version": "1.0.0",
+  "description": "Enlace Agenda Pro - Sistema Inteligente de Citas y Reservas para Profesionales y Empresas",
+  "scripts": {
+    "build": "npm run build -w apps/web",
+    "dev": "concurrently -n api,web -c red,cyan \"npm run dev -w apps/api\" \"npm run dev -w apps/web\"",
+    "dev:api": "npm run dev -w apps/api",
+    "dev:web": "npm run dev -w apps/web",
+    "db:migrate": "npm run db:migrate -w apps/api",
+    "db:seed": "npm run db:seed -w apps/api"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "workspaces": [
+    "apps/*"
+  ],
+  "private": true,
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "md-to-pdf": "^5.2.5",
+    "pdf-parse": "^2.4.5"
+  }
+}

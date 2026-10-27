@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documento Maestro: Esqueleto Universal para Apps Enlace</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f8fafc;
+            --muted: #94a3b8;
+            --accent: #2563eb;
+            --border: #334155;
+            --orange: #f5a020;
+        }
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            margin: 0;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--card);
+            padding: 40px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 10px;
+        }
+        h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--orange);
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        p, li {
+            font-size: 14px;
+            color: var(--muted);
+        }
+        strong {
+            color: var(--text);
+        }
+        pre {
+            background: #0b1329;
+            padding: 16px;
+            border-radius: 10px;
+            border: 0.5px solid var(--border);
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            color: #e2e8f0;
+        }
+        code {
+            font-family: 'Fira Code', monospace;
+            background: rgba(255,255,255,0.1);
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+        .checklist li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .checklist input {
+            accent-color: var(--accent);
+        }
+        hr {
+            border: 0;
+            height: 1px;
+            background: var(--border);
+            margin: 40px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Documento Maestro: Esqueleto Universal para Apps Enlace</h1>
+        <p>Este documento define el <strong>esqueleto base (boilerplate)</strong> extraído de <em>Enlace Barbería Pro (EBP)</em>. Sirve como estándar de oro para crear cualquiera de las 15 aplicaciones verticales del ecosistema Enlace. Al clonar o replicar este esqueleto, solo se deben modificar los módulos específicos de cada rubro.</p>
+
+        <h2>1. Stack Tecnológico Estándar</h2>
+        <p>Todas las apps del ecosistema deben usar estrictamente este stack para facilitar el mantenimiento:</p>
+        <ul>
+            <li><strong>Monorepo:</strong> npm workspaces (Carpeta <code>apps/api</code> y <code>apps/web</code>).</li>
+            <li><strong>Backend:</strong> Node.js + Express.</li>
+            <li><strong>Base de Datos:</strong> SQLite (local por negocio) gestionado con <strong>Prisma ORM</strong>.</li>
+            <li><strong>Frontend:</strong> React (Vite) + Vanilla CSS (Aesthetics Premium).</li>
+            <li><strong>Estilo Visual:</strong> Dark mode por defecto, paleta marina/oscura (<code>#1a2a4a</code>), micro-animaciones.</li>
+        </ul>
+
+        <hr>
+
+        <h2>2. El Esqueleto del Backend (<code>apps/api</code>)</h2>
+        <h3>2.1 Base de Datos Mínima Obligatoria (<code>schema.prisma</code>)</h3>
+        <p>Toda app nueva debe incluir al menos estos modelos para funcionar en el ecosistema:</p>
+        <pre><code>model Shop {
+  id                 String        @id @default(cuid())
+  appId              AppId         // Identificador de la app (ej: PELUQUERIA)
+  slug               String        @unique
+  name               String
+  enlaceProfileId    String?       // ID en la Red Social Madre
+  enlaceTokenApp     String?       // Token de comunicación
+  enlaceDisponible   Boolean       @default(false)
+  enlaceMsg          String        @default("Disponible ahora")
+  
+  admins             AdminUser[]
+  outbox             EnlaceOutbox[]
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  shopId       String
+  email        String   @unique
+  passwordHash String
+  shop         Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+}
+
+model EnlaceOutbox {
+  id            String   @id @default(cuid())
+  shopId        String
+  endpoint      String   // 'publicar-foto', 'sync-catalogo', etc.
+  method        String   @default("POST")
+  body          Json
+  status        String   @default("PENDING") // PENDING, SENT, FAILED
+  attempts      Int      @default(0)
+  nextAttemptAt DateTime @default(now())
+  
+  shop          Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+}</code></pre>
+
+        <h3>2.2 Rutas y Controladores Base</h3>
+        <p>El archivo <code>index.js</code> debe mantener:</p>
+        <ul>
+            <li><strong>Auth System:</strong> <code>/api/auth/register</code>, <code>/api/auth/login</code>, <code>/api/auth/logout</code>.</li>
+            <li><strong>Middlewares:</strong> <code>requireAuth</code> (verifica sesión), <code>asyncHandler</code> (captura errores).</li>
+            <li><strong>Conexión Enlace:</strong>
+                <ul>
+                    <li><code>POST /api/enlace/link</code>: Vincula con el código de 6 dígitos.</li>
+                    <li><code>POST /api/enlace/unlink</code>: Desvincula.</li>
+                    <li><code>POST /api/enlace/toggle</code>: Cambia visibilidad en el mapa.</li>
+                </ul>
+            </li>
+            <li><strong>Procesador Outbox:</strong> El <code>setInterval</code> que corre cada 30 segundos procesando <code>EnlaceOutbox</code>.</li>
+        </ul>
+
+        <hr>
+
+        <h2>3. El Esqueleto del Frontend (<code>apps/web</code>)</h2>
+        <h3>3.1 Estructura de Navegación y Layout</h3>
+        <p>El archivo <code>AdminShell.jsx</code> es el contenedor principal y debe mantener:</p>
+        <ul>
+            <li><strong>Bottom Nav (Mobile-First):</strong> 5 pestañas máximo (Inicio, Agenda/Módulo Principal, Clientes, Caja, Más).</li>
+            <li><strong>Header Premium:</strong> Título en gradiente, botón de modo oscuro y el botón de ayuda <code>❓</code>.</li>
+            <li><strong>Tutorial Interactivo:</strong> El modal paso a paso que se abre la primera vez.</li>
+        </ul>
+
+        <h3>3.2 Cliente API (<code>api.js</code>)</h3>
+        <p>El archivo que centraliza las peticiones debe incluir:</p>
+        <ul>
+            <li><code>apiGet(url)</code></li>
+            <li><code>apiPost(url, body)</code></li>
+            <li><code>apiPatch(url, body)</code></li>
+            <li><code>apiDelete(url, body)</code></li>
+        </ul>
+
+        <h3>3.3 Páginas Comunes que No Cambian</h3>
+        <ul>
+            <li><strong>Login / Register:</strong> Mismo diseño minimalista y oscuro.</li>
+            <li><strong>Página Enlace (<code>Enlace.jsx</code>):</strong> El centro de mando para vincularse a la red social.</li>
+            <li><strong>Configuración (<code>Configuracion.jsx</code>):</strong> Datos del negocio, datos bancarios y la "Zona Peligrosa".</li>
+        </ul>
+
+        <hr>
+
+        <h2>4. Lo que se Modifica por Aplicación</h2>
+        <p>Cuando crees una nueva app (ej: <em>Enlace Gimnasio</em>), debes buscar y modificar solo estos puntos:</p>
+        <ol>
+            <li><strong><code>APP_SLUG</code> en <code>.env</code>:</strong> Cambiar <code>peluqueria</code> por el slug correspondiente (ej: <code>gimnasio</code>).</li>
+            <li><strong>Módulo Principal:</strong> Reemplazar la "Agenda" por el módulo core del rubro (ej: Control de acceso y membresías).</li>
+            <li><strong>Formularios Específicos:</strong> Guardar datos relevantes al rubro en las fichas de clientes.</li>
+            <li><strong>Página Pública de Reservas (Booking):</strong> Adaptar el flujo de reserva al tipo de servicio.</li>
+        </ol>
+
+        <hr>
+
+        <h2>5. Checklist para Iniciar una App Nueva</h2>
+        <ul class="checklist">
+            <li><input type="checkbox"> Duplicar la estructura de carpetas de EBP.</li>
+            <li><input type="checkbox"> Cambiar nombres en <code>package.json</code> de la raíz y de las apps.</li>
+            <li><input type="checkbox"> Actualizar <code>schema.prisma</code> con las tablas específicas del nuevo rubro.</li>
+            <li><input type="checkbox"> Configurar variables de entorno (<code>SUPABASE_URL</code>, <code>ANON_KEY</code>, <code>APP_SLUG</code>).</li>
+            <li><input type="checkbox"> Rediseñar el módulo central en el frontend manteniendo el <code>AdminShell</code>.</li>
+        </ul>
+
+        <hr>
+        <p style="text-align: center; font-size: 11px; color: var(--muted);">Este documento es de propiedad de Bajo Deslinde SPA y rige para todo el desarrollo del Ecosistema Enlace.</p>
+    </div>
+</body>
+</html>

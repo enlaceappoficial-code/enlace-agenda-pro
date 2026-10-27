@@ -1,0 +1,138 @@
+/* ============================================================
+   ENLACE MASCOTAS — FRIENDLY STARTUP THEME
+   Concepto: Startup divertida. Energía positiva. Duolingo SaaS.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+[data-theme="mascotas"],
+:root[data-theme="mascotas"] {
+
+  /* ─── PALETA CORE ─── */
+  --primary:          #FF7A00;
+  --primary-hover:    #FF8C1A;
+  --primary-active:   #E86800;
+  --primary-glow:     rgba(255, 122, 0, 0.18);
+  --primary-subtle:   rgba(255, 122, 0, 0.08);
+
+  /* ─── FONDOS ─── */
+  --background:       #FFF8F1;
+  --card-bg:          #FFFFFF;
+  --card-bg-2:        #FFF1E6;
+  --overlay:          rgba(255, 248, 241, 0.92);
+
+  /* ─── BORDES ─── */
+  --border:           #FFEADB;
+  --border-strong:    rgba(255, 122, 0, 0.30);
+
+  /* ─── TEXTOS ─── */
+  --text-main:        #2D3748;
+  --text-muted:       #718096;
+  --text-soft:        #A0AEC0;
+
+  /* ─── SEMÁNTICOS ─── */
+  --bg:               var(--background);
+  --card:             var(--card-bg);
+  --hover:            #FFF1E6;
+  --text:             var(--text-main);
+  --muted:            var(--text-muted);
+  --accent:           var(--primary);
+  --accent-dark:      var(--primary-active);
+  --nav-bg:           #FFFFFF;
+  --nav-border:       #FFEADB;
+  --btn-secondary:    rgba(91, 141, 239, 0.08);
+  --btn-secondary-text: #5B8DEF;
+  --red:              #FC8181;
+  --orange:           var(--primary);
+  --green:            #34D399;
+
+  /* ─── TIPOGRAFÍA ─── */
+  --font-heading:     'Baloo 2', system-ui, sans-serif;
+  --font-body:        'Plus Jakarta Sans', system-ui, sans-serif;
+  --fw-heading:       800;
+  --ls-heading:       -0.01em;
+
+  /* ─── RADIOS — Exagerados y amigables ─── */
+  --radius-xl:        28px;
+  --radius-lg:        18px;
+  --radius-md:        12px;
+  --radius-sm:        8px;
+  --radius-xs:        6px;
+
+  /* ─── SOMBRAS — Coloridas, tipo pegatina 3D ─── */
+  --shadow-card:      0 8px 0px 0 #FFEADB,
+                      0 10px 24px rgba(255,122,0,0.06);
+  --shadow-popover:   0 12px 32px rgba(45,55,72,0.10),
+                      0 4px 0 0 rgba(255,122,0,0.10);
+  --shadow-glow:      0 0 24px rgba(255,122,0,0.30);
+  --shadow-btn:       0 6px 0 0 #E86800,
+                      0 8px 20px rgba(255,122,0,0.20);
+  --shadow-inset:     inset 0 1px 0 rgba(255,255,255,0.90);
+
+  /* ─── EFECTOS ─── */
+  --backdrop-blur:    blur(6px);
+
+  /* ─── MOTION — Elástico, bounce, pop ─── */
+  --transition-speed: 240ms;
+  --motion-ease:      cubic-bezier(0.34, 1.56, 0.64, 1);
+  --transition:       all 240ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ─── AGENDA ─── */
+  --slot-selected-bg:     rgba(91,141,239,0.12);
+  --slot-selected-border: #5B8DEF;
+  --slot-selected-glow:   0 0 16px rgba(91,141,239,0.24);
+
+  /* ─── IDENTIDAD ─── */
+  --app-name:         "MASCOTAS";
+  --app-label-color:  #5B8DEF;
+}
+
+[data-theme="mascotas"] body {
+  font-family: var(--font-body);
+}
+
+[data-theme="mascotas"] h1,
+[data-theme="mascotas"] h2,
+[data-theme="mascotas"] h3 {
+  font-family: var(--font-heading);
+  font-weight: var(--fw-heading);
+  letter-spacing: var(--ls-heading);
+}
+
+[data-theme="mascotas"] ::-webkit-scrollbar {
+  width: 4px;
+}
+[data-theme="mascotas"] ::-webkit-scrollbar-track {
+  background: var(--background);
+}
+[data-theme="mascotas"] ::-webkit-scrollbar-thumb {
+  background: rgba(255, 122, 0, 0.25);
+  border-radius: 999px;
+}
+
+[data-theme="mascotas"] .glass {
+  background: rgba(255, 255, 255, 0.80);
+  backdrop-filter: var(--backdrop-blur);
+  -webkit-backdrop-filter: var(--backdrop-blur);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-card);
+}
+
+[data-theme="mascotas"] .btn-primary {
+  background: var(--primary);
+  box-shadow: var(--shadow-btn);
+  color: #FFFFFF;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  transition: var(--transition);
+  transform: translateY(-2px);
+}
+[data-theme="mascotas"] .btn-primary:hover {
+  background: var(--primary-hover);
+  box-shadow: 0 8px 0 0 #E86800, 0 12px 28px rgba(255,122,0,0.25);
+  transform: translateY(-3px) scale(1.02);
+}
+[data-theme="mascotas"] .btn-primary:active {
+  transform: translateY(2px) scale(0.97);
+  box-shadow: 0 2px 0 0 #E86800;
+}
