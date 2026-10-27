@@ -25,6 +25,12 @@ const MENU_GROUPS = [
     ]
   },
   {
+    group: 'Ayuda & Tutorial',
+    items: [
+      { title: 'Tutorial & Guía Rápida', sub: 'Conoce cómo usar servicios, clases y encargos', icon: '💡', action: 'tutorial', highlight: true },
+    ]
+  },
+  {
     group: 'Configuración',
     items: [
       { title: 'Paleta de Colores', sub: 'Personaliza los colores y tema de la app', icon: '🎨', action: 'theme', highlight: true },
@@ -36,7 +42,7 @@ const MENU_GROUPS = [
 
 export default function More() {
   const nav = useNavigate()
-  const { shop, setShop } = useOutletContext() || {}
+  const { shop, setShop, openTutorial } = useOutletContext() || {}
   const [showThemeModal, setShowThemeModal] = useState(false)
   const [savingType, setSavingType] = useState(false)
   const [toastMsg, setToastMsg] = useState('')
@@ -207,6 +213,9 @@ export default function More() {
                 key={i}
                 onClick={() => {
                   if (item.action === 'theme') setShowThemeModal(true)
+                  else if (item.action === 'tutorial') {
+                    if (openTutorial) openTutorial()
+                  }
                   else if (item.to) nav(item.to)
                 }}
                 style={{

@@ -5,7 +5,7 @@ import { useAppTheme } from '../../context/ThemeContext'
 import ThemeSelectorModal from '../../components/ThemeSelectorModal'
 
 // ─── CONFIGURACIÓN POR TEMA ────────────────────────────────────────────────
-const SLUG = import.meta.env.VITE_APP_SLUG || 'peluqueria'
+const SLUG = import.meta.env.VITE_APP_SLUG || 'agenda_pro'
 
 const THEME_CONFIG = {
   peluqueria: {
@@ -26,10 +26,10 @@ const THEME_CONFIG = {
   agenda_pro: {
     name: 'ENLACE', label: 'AGENDA', labelHighlight: 'PRO',
     labelColor: '#2563EB', highlightColor: '#16A34A',
-    tutorialTitle: '¡Bienvenido a Enlace Agenda PRO! 🩺',
+    tutorialTitle: '¡Bienvenido a Enlace Agenda PRO! 📅',
   },
 }
-const THEME = THEME_CONFIG[SLUG] || THEME_CONFIG.peluqueria
+const THEME = THEME_CONFIG[SLUG] || THEME_CONFIG.agenda_pro
 // ──────────────────────────────────────────────────────────────────────────
 
 const TABS = [
@@ -530,7 +530,7 @@ export default function AdminShell() {
 
         {/* CONTAINER CENTRADO PARA EL CONTENIDO */}
         <div className="admin-content-container">
-          <Outlet context={{ shop, setShop, enlace, setEnlace }} />
+          <Outlet context={{ shop, setShop, enlace, setEnlace, openTutorial: () => setShowTutorial(true) }} />
         </div>
       </div>
 
@@ -612,63 +612,178 @@ export default function AdminShell() {
 // ─── TUTORIAL MODAL ───────────────────────────────────────────────────────
 function TutorialModal({ onClose }) {
   const [step, setStep] = useState(0)
+
   const steps = [
-    { title: THEME.tutorialTitle, content: 'Estamos felices de tenerte. Vamos a darte un recorrido rápido por las herramientas que llevarán tu negocio al siguiente nivel.' },
-    { title: '📊 Dashboard de Control', content: 'Aquí verás el rendimiento del día, tus ingresos estimados, porcentaje de ocupación y las próximas citas de manera rápida.' },
-    { title: '📅 Agenda Inteligente', content: 'Visualiza tus citas del día, semana o mes. Puedes agendar manualmente, mover citas y bloquear horarios.' },
-    { title: '💰 Control de Caja y Gastos', content: 'Registra tus ingresos diarios, propinas, y lleva un control estricto de tus gastos fijos y extras para saber exactamente tu ganancia neta.' },
-    { title: '👥 Fidelización de Clientes', content: 'Accede a tu base de datos de clientes con su historial completo de visitas, notas especiales y contacto directo por WhatsApp.' },
-    { title: '🔗 Tu Link de Reservas', content: '¡Tu arma secreta! Comparte tu link único en Instagram o WhatsApp. Tus clientes agendarán solos las 24 horas del día.' },
-    { title: '🚀 ¡Hora de empezar!', content: 'Tu primer paso es crear tus servicios reales. Ve a la sección "Más" y luego a "Servicios". ¡Mucho éxito en tu negocio!' },
+    {
+      icon: '📅',
+      badge: 'BIENVENIDO A ENLACE AGENDA PRO',
+      title: 'Tu tiempo y negocio bajo control',
+      content: 'Te damos la bienvenida a tu ecosistema de gestión integral. Agenda Pro está diseñada para adaptarse a tu estilo de trabajo: ya sea que atiendas citas presenciales, dictes clases o asesorías online, o fabriques y entregues productos por encargo.',
+      tip: '💡 Pensado especialmente para profesores, terapeutas, consultores y emprendedores.'
+    },
+    {
+      icon: '🏢 💻 📦',
+      badge: '3 MODALIDADES EN 1 SOLA APP',
+      title: 'Presencial, Online y Encargos',
+      content: 'Configura tus servicios según la forma exacta en que atiendes:\n\n• 🏢 Presencial: Atenciones en tu local, consultorio o sala.\n• 💻 Online: Asesorías y clases con enlace directo a Google Meet o Zoom.\n• 📦 Encargo: Venta y confección de productos personalizados (timbres, sellos, papelería) con fecha estimada de entrega o retiro.',
+      tip: '✨ Gestiona múltiples facetas de tu negocio en una sola plataforma.'
+    },
+    {
+      icon: '✍️',
+      badge: 'ESPECIFICACIONES DE ENCARGO',
+      title: 'Cero enredos por WhatsApp',
+      content: 'Cuando un cliente pide un producto personalizado (como un timbre o sello), el sistema le solicita obligatoriamente el texto exacto, RUT, cargo, color de tinta o notas de diseño antes de confirmar su pedido.',
+      tip: '🎯 Recibes toda la información lista para comenzar a fabricar.'
+    },
+    {
+      icon: '🏷️',
+      badge: 'CATEGORÍAS & FILTROS RÁPIDOS',
+      title: 'Tu link de reservas ordenado 24/7',
+      content: 'Tus clientes verán tus servicios agrupados en pestañas interactivas (ej: Clases, Asesorías, Timbres). Podrán filtrar con un solo toque desde su celular y reservar a cualquier hora del día.',
+      tip: '🔗 Comparte tu link único en Instagram, WhatsApp o tu bio.'
+    },
+    {
+      icon: '⚡',
+      badge: 'SEÑAS Y ABONOS DE FABRICACIÓN',
+      title: 'Protege tus horas y asegura insumos',
+      content: 'Evita cancelaciones pidiendo una seña obligatoria para citas o un abono (ej: 50%) para iniciar la confección de tus encargos. Tu cliente adjunta la captura de su transferencia y tú la verificas con un clic.',
+      tip: '🛡️ Elimina los clientes fantasma (anti no-show) y cubre tus materiales.'
+    },
+    {
+      icon: '📆',
+      badge: 'AGENDA & CALENDARIO INTELIGENTE',
+      title: 'Citas, clases y retiros en una sola vista',
+      content: 'Visualiza tus compromisos del día o la semana. Puedes agendar citas manuales, bloquear horarios de descanso o almuerzo, y consultar los detalles de cada pedido de un vistazo.',
+      tip: '⏰ Sincronización instantánea de horas ocupadas y disponibles.'
+    },
+    {
+      icon: '📲',
+      badge: 'WHATSAPP EN 1 TOQUE',
+      title: 'Confirmaciones y recordatorios',
+      content: 'Tanto tus clientes al reservar como tú desde la agenda pueden enviar mensajes automáticos de WhatsApp con el resumen de la cita, las especificaciones del encargo o el enlace de la reunión.',
+      tip: '💬 Mensajes profesionales y amables listos con un solo toque.'
+    },
+    {
+      icon: '💰',
+      badge: 'CONTROL DE CAJA Y COSTOS',
+      title: 'Conoce tu margen de ganancia real',
+      content: 'Registra tus ingresos diarios, propinas, gastos operativos y costos de insumos por servicio. Conoce tu margen neto exacto y mantén el historial completo de cada cliente.',
+      tip: '📊 Finanzas claras para hacer crecer tu emprendimiento.'
+    },
+    {
+      icon: '🚀',
+      badge: '¡LISTO PARA COMENZAR!',
+      title: 'Crea tus primeros servicios',
+      content: 'Tu primer paso es ir a la sección "Más" > "Servicios & Atenciones" y crear tus servicios reales con su modalidad (Presencial, Online o Encargo). ¡Mucho éxito con tu Agenda Pro!',
+      tip: '🎉 ¡Siempre puedes volver a abrir este tutorial desde el botón de ayuda (?)!'
+    }
   ]
+
+  const curr = steps[step]
 
   return (
     <div style={{
       position: 'fixed', inset: 0,
-      background: 'rgba(0,0,0,0.75)',
+      background: 'rgba(0,0,0,0.78)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      zIndex: 1000, padding: 20,
+      zIndex: 1000, padding: 16,
       backdropFilter: 'blur(8px)',
     }}>
       <div style={{
         background: 'var(--card)',
-        padding: 28,
-        borderRadius: 'var(--radius-lg)',
+        padding: '24px 22px',
+        borderRadius: 20,
         border: '1px solid var(--border-strong)',
-        boxShadow: 'var(--shadow-popover)',
-        maxWidth: 380, width: '100%',
+        boxShadow: '0 20px 50px rgba(0,0,0,0.4)',
+        maxWidth: 420, width: '100%',
         position: 'relative', overflow: 'hidden',
+        display: 'flex', flexDirection: 'column',
       }}>
-        {/* Línea dorada decorativa */}
+        {/* Línea decorativa superior */}
         <div style={{
-          position: 'absolute', top: 0, left: 0, right: 0, height: 2,
+          position: 'absolute', top: 0, left: 0, right: 0, height: 3,
           background: 'linear-gradient(90deg, transparent, var(--accent), transparent)',
         }} />
 
-        {/* Paso indicator */}
-        <div style={{ display: 'flex', gap: 4, marginBottom: 20 }}>
+        {/* Header con botón cerrar */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+          <div style={{
+            fontSize: 10, fontWeight: 800, color: 'var(--accent)',
+            letterSpacing: '0.08em', textTransform: 'uppercase'
+          }}>
+            {curr.badge}
+          </div>
+          <button
+            onClick={onClose}
+            style={{
+              background: 'transparent', border: 'none', color: 'var(--text-muted)',
+              fontSize: 18, cursor: 'pointer', padding: 4, lineHeight: 1,
+              borderRadius: 6
+            }}
+            title="Cerrar tutorial"
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Indicador de pasos (barras de progreso) */}
+        <div style={{ display: 'flex', gap: 4, marginBottom: 18 }}>
           {steps.map((_, i) => (
             <div key={i} style={{
-              flex: 1, height: 2, borderRadius: 2,
+              flex: 1, height: 3, borderRadius: 2,
               background: i <= step ? 'var(--accent)' : 'var(--border)',
-              transition: 'var(--transition)',
+              transition: 'all 0.25s ease',
             }} />
           ))}
         </div>
 
-        <h2 style={{
-          fontFamily: 'var(--font-heading)', fontSize: 18,
-          fontWeight: 700, marginBottom: 10, color: 'var(--text-main)',
+        {/* Icono y Título */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+          <div style={{
+            width: 50, height: 50, borderRadius: 14,
+            background: 'rgba(37, 99, 235, 0.12)',
+            border: '1px solid rgba(37, 99, 235, 0.25)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 22, flexShrink: 0
+          }}>
+            {curr.icon}
+          </div>
+          <div>
+            <h2 style={{
+              fontSize: 17, fontWeight: 800, margin: 0,
+              color: 'var(--text-main)', lineHeight: 1.3
+            }}>
+              {curr.title}
+            </h2>
+          </div>
+        </div>
+
+        {/* Contenido con saltos de línea */}
+        <p style={{
+          fontSize: 13.5, color: 'var(--text-muted)',
+          lineHeight: '1.6', margin: '0 0 14px 0',
+          whiteSpace: 'pre-line'
         }}>
-          {steps[step].title}
-        </h2>
-        <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: '1.65', marginBottom: 24 }}>
-          {steps[step].content}
+          {curr.content}
         </p>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontSize: 11, color: 'var(--text-soft)', fontWeight: 600 }}>
-            {step + 1} / {steps.length}
+        {/* Caja de Consejo / Tip */}
+        {curr.tip && (
+          <div style={{
+            background: 'rgba(37, 99, 235, 0.06)',
+            border: '1px solid rgba(37, 99, 235, 0.2)',
+            borderRadius: 12, padding: '10px 12px',
+            fontSize: 12, color: 'var(--text-main)',
+            marginBottom: 20, lineHeight: 1.4
+          }}>
+            {curr.tip}
+          </div>
+        )}
+
+        {/* Navegación inferior */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
+          <span style={{ fontSize: 11, color: 'var(--text-soft)', fontWeight: 700 }}>
+            {step + 1} de {steps.length}
           </span>
           <div style={{ display: 'flex', gap: 8 }}>
             {step > 0 && (
@@ -676,8 +791,8 @@ function TutorialModal({ onClose }) {
                 onClick={() => setStep(step - 1)}
                 style={{
                   background: 'var(--btn-secondary)', color: 'var(--btn-secondary-text)',
-                  border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)',
-                  padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer',
+                  border: '1px solid var(--border)', borderRadius: 10,
+                  padding: '8px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer',
                 }}
               >
                 Atrás
@@ -686,15 +801,15 @@ function TutorialModal({ onClose }) {
             <button
               onClick={() => step < steps.length - 1 ? setStep(step + 1) : onClose()}
               style={{
-                background: 'linear-gradient(135deg, var(--primary), var(--primary-hover))',
-                color: 'var(--bg)',
-                border: 'none', borderRadius: 'var(--radius-sm)',
-                padding: '8px 20px', fontSize: 13, fontWeight: 800,
+                background: 'var(--accent)',
+                color: 'white',
+                border: 'none', borderRadius: 10,
+                padding: '9px 18px', fontSize: 12.5, fontWeight: 800,
                 cursor: 'pointer',
-                boxShadow: 'var(--shadow-btn)',
+                boxShadow: '0 4px 12px rgba(37, 99, 235, 0.35)',
               }}
             >
-              {step < steps.length - 1 ? 'Siguiente →' : '¡Empezar!'}
+              {step < steps.length - 1 ? 'Siguiente →' : '¡Empezar a Configurar! 🚀'}
             </button>
           </div>
         </div>
