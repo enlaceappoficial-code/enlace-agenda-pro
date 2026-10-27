@@ -289,28 +289,41 @@ export default function Booking() {
         {step === 2 && (
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-              <button onClick={prevStep} style={{ border: 'none', background: 'transparent', fontSize: 20, cursor: 'pointer' }}>←</button>
-              <h2 style={{ fontSize: 18, fontWeight: 800 }}>
+              <button onClick={prevStep} style={{ border: 'none', background: 'transparent', fontSize: 22, cursor: 'pointer', color: 'var(--text)', padding: 0 }}>←</button>
+              <h2 style={{ fontSize: 18, fontWeight: 800, margin: 0 }}>
                 {selService?.modality === 'ENCARGO' ? '2. Día de retiro o entrega' : '2. Selecciona el día'}
               </h2>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
-              {availableDates.map(d => (
-                <button 
-                  key={d.iso}
-                  onClick={() => { setSelDate(d); nextStep() }}
-                  style={{
-                    background: selDate?.iso === d.iso ? 'var(--accent)' : 'white',
-                    color: selDate?.iso === d.iso ? 'white' : 'var(--text)',
-                    border: '0.5px solid var(--border)', borderRadius: 12, padding: '12px 4px',
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, cursor: 'pointer'
-                  }}
-                >
-                  <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase' }}>{d.weekday}</span>
-                  <span style={{ fontSize: 18, fontWeight: 800 }}>{d.day}</span>
-                  <span style={{ fontSize: 10, fontWeight: 700 }}>{d.month}</span>
-                </button>
-              ))}
+              {availableDates.map(d => {
+                const isSelected = selDate?.iso === d.iso
+                return (
+                  <button 
+                    key={d.iso}
+                    type="button"
+                    onClick={() => { setSelDate(d); nextStep() }}
+                    style={{
+                      background: isSelected ? 'var(--accent)' : 'var(--card)',
+                      color: isSelected ? '#ffffff' : 'var(--text)',
+                      border: isSelected ? '2px solid var(--accent)' : '1px solid var(--border)',
+                      borderRadius: 14, padding: '14px 6px',
+                      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, cursor: 'pointer',
+                      boxShadow: isSelected ? '0 4px 14px rgba(245, 160, 32, 0.4)' : '0 2px 6px rgba(0,0,0,0.2)',
+                      transition: 'all 0.15s ease'
+                    }}
+                  >
+                    <span style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', color: isSelected ? '#ffffff' : 'var(--muted)' }}>
+                      {d.weekday}
+                    </span>
+                    <span style={{ fontSize: 20, fontWeight: 800, color: isSelected ? '#ffffff' : 'var(--text)', lineHeight: 1.2 }}>
+                      {d.day}
+                    </span>
+                    <span style={{ fontSize: 10, fontWeight: 800, textTransform: 'capitalize', color: isSelected ? '#ffffff' : 'var(--muted)' }}>
+                      {d.month}
+                    </span>
+                  </button>
+                )
+              })}
             </div>
           </div>
         )}
@@ -319,8 +332,8 @@ export default function Booking() {
         {step === 3 && (
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-              <button onClick={prevStep} style={{ border: 'none', background: 'transparent', fontSize: 20, cursor: 'pointer' }}>←</button>
-              <h2 style={{ fontSize: 18, fontWeight: 800 }}>
+              <button onClick={prevStep} style={{ border: 'none', background: 'transparent', fontSize: 22, cursor: 'pointer', color: 'var(--text)', padding: 0 }}>←</button>
+              <h2 style={{ fontSize: 18, fontWeight: 800, margin: 0 }}>
                 {selService?.modality === 'ENCARGO' ? '3. Hora estimada de retiro' : '3. Elige la hora'}
               </h2>
             </div>
@@ -330,20 +343,27 @@ export default function Booking() {
               <div style={{ textAlign: 'center', padding: 20, color: 'var(--muted)' }}>No hay horas disponibles para este día</div>
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
-                {availableSlots.map(t => (
-                  <button 
-                    key={t}
-                    onClick={() => { setSelTime(t); nextStep() }}
-                    style={{
-                      background: selTime === t ? 'var(--accent)' : 'white',
-                      color: selTime === t ? 'white' : 'var(--text)',
-                      border: '0.5px solid var(--border)', borderRadius: 12, padding: 14,
-                      fontWeight: 800, fontSize: 14, cursor: 'pointer'
-                    }}
-                  >
-                    {t}
-                  </button>
-                ))}
+                {availableSlots.map(t => {
+                  const isSelected = selTime === t
+                  return (
+                    <button 
+                      key={t}
+                      type="button"
+                      onClick={() => { setSelTime(t); nextStep() }}
+                      style={{
+                        background: isSelected ? 'var(--accent)' : 'var(--card)',
+                        color: isSelected ? '#ffffff' : 'var(--text)',
+                        border: isSelected ? '2px solid var(--accent)' : '1px solid var(--border)',
+                        borderRadius: 14, padding: '16px 8px',
+                        fontWeight: 800, fontSize: 15, cursor: 'pointer',
+                        boxShadow: isSelected ? '0 4px 14px rgba(245, 160, 32, 0.4)' : '0 2px 6px rgba(0,0,0,0.2)',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      {t}
+                    </button>
+                  )
+                })}
               </div>
             )}
           </div>
@@ -353,8 +373,8 @@ export default function Booking() {
         {step === 4 && (
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-              <button onClick={prevStep} style={{ border: 'none', background: 'transparent', fontSize: 20, cursor: 'pointer' }}>←</button>
-              <h2 style={{ fontSize: 18, fontWeight: 800 }}>4. Tus datos</h2>
+              <button onClick={prevStep} style={{ border: 'none', background: 'transparent', fontSize: 22, cursor: 'pointer', color: 'var(--text)', padding: 0 }}>←</button>
+              <h2 style={{ fontSize: 18, fontWeight: 800, margin: 0 }}>4. Tus datos</h2>
             </div>
 
             <div style={{ background: 'var(--card)', borderRadius: 14, border: '0.5px solid var(--border)', padding: 16, marginBottom: 20 }}>
@@ -368,7 +388,7 @@ export default function Booking() {
                   {selService?.modality === 'ONLINE' ? '💻 Online / Remoto' : selService?.modality === 'ENCARGO' ? '📦 Encargo personalizado' : '🏢 Presencial'}
                 </span>
               </div>
-              <div style={{ fontWeight: 800, fontSize: 16 }}>{selService.name}</div>
+              <div style={{ fontWeight: 800, fontSize: 16, color: 'var(--text)' }}>{selService.name}</div>
               <div style={{ fontSize: 14, color: 'var(--text)', marginTop: 4 }}>
                 {selService?.modality === 'ENCARGO' ? '📦 Fecha de retiro: ' : '📅 '}
                 {new Date(selDate.iso + 'T12:00:00').toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
@@ -399,19 +419,19 @@ export default function Booking() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <input 
                 placeholder="Nombre completo *" 
-                style={{ padding: 16, borderRadius: 12, border: '1px solid var(--border)', fontSize: 15 }}
+                style={{ padding: 16, borderRadius: 12, border: '1px solid var(--border)', background: 'var(--card)', color: 'var(--text)', fontSize: 15 }}
                 value={form.name}
                 onChange={e => setForm({ ...form, name: e.target.value })}
               />
               <input 
                 placeholder="WhatsApp (ej: 56912345678) *" 
-                style={{ padding: 16, borderRadius: 12, border: '1px solid var(--border)', fontSize: 15 }}
+                style={{ padding: 16, borderRadius: 12, border: '1px solid var(--border)', background: 'var(--card)', color: 'var(--text)', fontSize: 15 }}
                 value={form.phone}
                 onChange={e => setForm({ ...form, phone: e.target.value })}
               />
               <input 
                 placeholder="Correo electrónico (opcional)" 
-                style={{ padding: 16, borderRadius: 12, border: '1px solid var(--border)', fontSize: 15 }}
+                style={{ padding: 16, borderRadius: 12, border: '1px solid var(--border)', background: 'var(--card)', color: 'var(--text)', fontSize: 15 }}
                 value={form.email}
                 onChange={e => setForm({ ...form, email: e.target.value })}
               />
@@ -423,7 +443,7 @@ export default function Booking() {
                   </label>
                   <textarea 
                     placeholder="Escribe el texto exacto del timbre (Nombre, Rut, Cargo), color de tinta (negro/azul/rojo), dibujo o detalles específicos..." 
-                    style={{ width: '100%', padding: 14, borderRadius: 12, border: '2px solid var(--accent)', background: 'rgba(37, 99, 235, 0.03)', fontSize: 14, minHeight: 90, boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: 14, borderRadius: 12, border: '2px solid var(--accent)', background: 'var(--card)', color: 'var(--text)', fontSize: 14, minHeight: 90, boxSizing: 'border-box' }}
                     value={form.notes}
                     onChange={e => setForm({ ...form, notes: e.target.value })}
                   />
@@ -434,7 +454,7 @@ export default function Booking() {
               ) : (
                 <textarea 
                   placeholder="Notas o comentarios adicionales (opcional)" 
-                  style={{ padding: 16, borderRadius: 12, border: '1px solid var(--border)', fontSize: 15, minHeight: 80 }}
+                  style={{ padding: 16, borderRadius: 12, border: '1px solid var(--border)', background: 'var(--card)', color: 'var(--text)', fontSize: 15, minHeight: 80 }}
                   value={form.notes}
                   onChange={e => setForm({ ...form, notes: e.target.value })}
                 />
@@ -488,8 +508,8 @@ export default function Booking() {
                 </div>
               )}
 
-              <div style={{ background: '#f3f4f6', padding: 12, borderRadius: 10, fontSize: 12, color: 'var(--muted)', lineHeight: 1.4 }}>
-                <strong>Política:</strong> {shop.cancellationPolicy}
+              <div style={{ background: 'rgba(255, 255, 255, 0.05)', border: '1px solid var(--border)', padding: 12, borderRadius: 10, fontSize: 12, color: 'var(--text)', lineHeight: 1.4 }}>
+                <strong style={{ color: 'var(--accent)' }}>Política:</strong> {shop.cancellationPolicy}
               </div>
 
               <button 
@@ -528,8 +548,8 @@ export default function Booking() {
         {step === 5 && hasStep5 && (
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-              <button onClick={prevStep} style={{ border: 'none', background: 'transparent', fontSize: 20, cursor: 'pointer' }}>←</button>
-              <h2 style={{ fontSize: 18, fontWeight: 800 }}>
+              <button onClick={prevStep} style={{ border: 'none', background: 'transparent', fontSize: 22, cursor: 'pointer', color: 'var(--text)', padding: 0 }}>←</button>
+              <h2 style={{ fontSize: 18, fontWeight: 800, margin: 0 }}>
                 {isMandatoryDeposit ? '⚡ 5. Depositar Seña' : '💎 5. Pago Anticipado'}
               </h2>
             </div>

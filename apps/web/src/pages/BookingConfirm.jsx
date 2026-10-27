@@ -83,11 +83,11 @@ export default function BookingConfirm() {
           </div>
 
           {appointment.notes && (
-            <div style={{ paddingTop: 10, borderTop: '0.5px solid #eee' }}>
+            <div style={{ paddingTop: 10, borderTop: '0.5px solid var(--border)' }}>
               <div style={{ fontSize: 12, color: 'var(--muted)', fontWeight: 700 }}>
                 {isEncargo ? 'ESPECIFICACIONES DEL ENCARGO' : 'NOTAS DEL CLIENTE'}
               </div>
-              <div style={{ fontSize: 13, marginTop: 4, fontStyle: 'italic', color: 'var(--text)', background: 'rgba(0,0,0,0.03)', padding: 10, borderRadius: 8 }}>
+              <div style={{ fontSize: 13, marginTop: 4, fontStyle: 'italic', color: 'var(--text)', background: 'rgba(255, 255, 255, 0.05)', padding: 10, borderRadius: 8, border: '0.5px solid var(--border)' }}>
                 "{appointment.notes}"
               </div>
             </div>
@@ -100,7 +100,7 @@ export default function BookingConfirm() {
             </div>
           )}
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 12, borderTop: '0.5px solid #eee' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 12, borderTop: '0.5px solid var(--border)' }}>
             <span style={{ fontWeight: 700, fontSize: 14 }}>Total a pagar</span>
             <span style={{ fontWeight: 800, fontSize: 16 }}>${appointment.price.toLocaleString('es-CL')}</span>
           </div>
