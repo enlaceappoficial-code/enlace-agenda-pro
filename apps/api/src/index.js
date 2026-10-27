@@ -1173,7 +1173,14 @@ app.get(
         date: appointment.startsAt.toISOString().slice(0, 10),
         time: appointment.startsAt.toTimeString().slice(0, 5),
         price: appointment.price,
-        service: { name: appointment.service.name, durationMin: appointment.service.durationMin },
+        notes: appointment.notes,
+        service: {
+          id: appointment.service.id,
+          name: appointment.service.name,
+          durationMin: appointment.service.durationMin,
+          modality: appointment.service.modality || 'PRESENCIAL',
+          instructions: appointment.service.instructions || null,
+        },
         guestName: appointment.guestName,
       },
     });
