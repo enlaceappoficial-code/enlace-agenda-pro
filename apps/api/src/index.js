@@ -1723,7 +1723,7 @@ app.delete(
 const webDistPath = path.resolve(__dirname, '../../web/dist');
 if (fs.existsSync(webDistPath)) {
   app.use(express.static(webDistPath));
-  app.get('*', (req, res, next) => {
+  app.get('{*path}', (req, res, next) => {
     if (req.path.startsWith('/api') || req.path.startsWith('/health') || req.path.startsWith('/public')) {
       return next();
     }
