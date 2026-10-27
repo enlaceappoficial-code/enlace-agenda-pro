@@ -164,8 +164,8 @@ export default function Booking() {
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <div style={{ width: 60, height: 60, borderRadius: 12, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 6, border: '1.5px solid rgba(255,255,255,0.2)' }}>
-               <img src="/logo-icon_1.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <div style={{ width: 68, height: 68, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 6 }}>
+               <img src="/logo-icon.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.35))' }} />
             </div>
             <div>
               <span style={{ fontSize: 20, fontWeight: 800, color: 'white', letterSpacing: '-0.5px' }}>ENLACE</span>

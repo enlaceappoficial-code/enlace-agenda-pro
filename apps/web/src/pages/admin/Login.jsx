@@ -79,32 +79,38 @@ export default function AdminLogin() {
         }} />
 
         {/* ── LOGO + BRAND ── */}
-        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+        <div style={{ textAlign: 'center', marginBottom: 28 }}>
           <div style={{
-            width: 72, height: 72, margin: '0 auto 14px',
-            borderRadius: 'var(--radius-lg)',
-            border: '1px solid var(--border-strong)',
-            background: 'var(--primary-subtle)',
+            margin: '0 auto 12px',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            overflow: 'hidden',
           }}>
-            <img src="/logo-icon.png" alt="Logo" style={{ width: '70%', height: '70%', objectFit: 'contain' }} />
+            <img 
+              src="/logo-icon.png" 
+              alt="Enlace Agenda Pro" 
+              style={{ 
+                width: 86, 
+                height: 86, 
+                objectFit: 'contain',
+                filter: 'drop-shadow(0 12px 24px rgba(37, 99, 235, 0.45)) drop-shadow(0 4px 10px rgba(245, 160, 32, 0.25))',
+                animation: 'float 3.5s ease-in-out infinite alternate',
+              }} 
+            />
           </div>
 
           <div style={{
-            fontFamily: 'var(--font-heading)', fontSize: 26, fontWeight: 700,
+            fontFamily: 'var(--font-heading)', fontSize: 26, fontWeight: 800,
             color: 'var(--text-main)', letterSpacing: 'var(--ls-heading)', lineHeight: 1,
           }}>
             ENLACE
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, marginTop: 4 }}>
-            <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--accent)', letterSpacing: '0.08em' }}>
+            <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--accent)', letterSpacing: '0.08em' }}>
               {T.label}
             </span>
             <div style={{ width: 3, height: 3, borderRadius: '50%', background: 'var(--border-strong)' }} />
             <span style={{
-              fontSize: 11, fontWeight: 800, letterSpacing: '0.08em',
+              fontSize: 11, fontWeight: 900, letterSpacing: '0.08em',
               background: 'linear-gradient(90deg, var(--accent), var(--primary-hover))',
               WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
             }}>
@@ -112,7 +118,7 @@ export default function AdminLogin() {
             </span>
           </div>
 
-          <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 10, fontWeight: 500 }}>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 8, fontWeight: 500 }}>
             {T.sub}
           </p>
         </div>
@@ -216,12 +222,19 @@ export default function AdminLogin() {
         </div>
 
         {/* Powered by */}
-        <div style={{ textAlign: 'center', marginTop: 18 }}>
-          <img src="/logo-icon_1.png" alt="Enlace" style={{ height: 28, opacity: 0.35 }} />
+        <div style={{ textAlign: 'center', marginTop: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+          <img src="/enlace-logo.png" alt="Enlace" style={{ height: 16, opacity: 0.5, objectFit: 'contain' }} />
+          <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>Enlace Agenda Pro</span>
         </div>
       </div>
 
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes float {
+          0% { transform: translateY(0px); }
+          100% { transform: translateY(-6px); }
+        }
+      `}</style>
     </div>
   )
 }

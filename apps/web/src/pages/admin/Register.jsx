@@ -88,16 +88,24 @@ export default function AdminRegister() {
         }} />
 
         {/* ── LOGO ── */}
-        <div style={{ textAlign: 'center', marginBottom: 28 }}>
+        <div style={{ textAlign: 'center', marginBottom: 24 }}>
           <div style={{
-            width: 60, height: 60, margin: '0 auto 12px',
-            borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-strong)',
-            background: 'var(--primary-subtle)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
+            margin: '0 auto 10px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
-            <img src="/logo-icon.png" alt="Logo" style={{ width: '70%', objectFit: 'contain' }} />
+            <img 
+              src="/logo-icon.png" 
+              alt="Logo" 
+              style={{ 
+                width: 76, 
+                height: 76, 
+                objectFit: 'contain',
+                filter: 'drop-shadow(0 10px 20px rgba(37, 99, 235, 0.45)) drop-shadow(0 4px 8px rgba(245, 160, 32, 0.25))',
+                animation: 'float 3.5s ease-in-out infinite alternate',
+              }} 
+            />
           </div>
-          <div style={{ fontFamily: 'var(--font-heading)', fontSize: 22, fontWeight: 700, color: 'var(--text-main)' }}>
+          <div style={{ fontFamily: 'var(--font-heading)', fontSize: 22, fontWeight: 800, color: 'var(--text-main)' }}>
             ENLACE <span style={{ background: 'linear-gradient(90deg, var(--accent), var(--primary-hover))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>{T.label}</span>
           </div>
 
@@ -293,12 +301,19 @@ export default function AdminRegister() {
           </span>
         </div>
 
-        <div style={{ textAlign: 'center', marginTop: 16 }}>
-          <img src="/logo-icon_1.png" alt="Enlace" style={{ height: 26, opacity: 0.3 }} />
+        <div style={{ textAlign: 'center', marginTop: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+          <img src="/enlace-logo.png" alt="Enlace" style={{ height: 16, opacity: 0.5, objectFit: 'contain' }} />
+          <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>Enlace Agenda Pro</span>
         </div>
       </div>
 
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes float {
+          0% { transform: translateY(0px); }
+          100% { transform: translateY(-6px); }
+        }
+      `}</style>
     </div>
   )
 }
