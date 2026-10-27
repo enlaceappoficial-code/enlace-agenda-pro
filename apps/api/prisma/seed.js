@@ -4,55 +4,64 @@ const { prisma } = require("../src/prisma");
 
 async function main() {
   const shop = await prisma.shop.upsert({
-    where: { slug: "mi-barberia" },
-    update: { appId: "PELUQUERIA", planId: "BASIC" },
+    where: { slug: "demo-agenda" },
+    update: { appId: "AGENDA_PRO", businessType: "salud", planId: "BASIC" },
     create: {
-      appId: "PELUQUERIA",
+      appId: "AGENDA_PRO",
+      businessType: "salud",
       planId: "BASIC",
-      name: "Barbería Demo",
+      name: "Centro de Atención & Agenda Pro",
       phone: "+56912345678",
       city: "La Serena",
-      slug: "mi-barberia",
-      openTime: "09:00",
-      closeTime: "20:00",
+      slug: "demo-agenda",
+      openTime: "08:30",
+      closeTime: "19:30",
       slotMinutes: 30,
-      breakStart: "14:00",
-      breakEnd: "15:00",
+      breakStart: "13:30",
+      breakEnd: "14:30",
       activeDays: [1, 2, 3, 4, 5, 6],
       cancellationPolicy:
-        "Cancela con al menos 2 horas de anticipación. No-shows frecuentes pueden requerir depósito.",
+        "Cancela o reprograma tu cita con al menos 2 horas de anticipación.",
       services: {
         create: [
           {
-            name: "Corte hombre",
-            category: "Corte",
+            name: "Consulta General / Evaluación",
+            category: "Salud & Bienestar",
             durationMin: 30,
-            price: 8000,
-            description: "Corte clásico o moderno",
+            price: 25000,
+            description: "Atención personalizada presencial u online con evaluación inicial.",
             active: true,
           },
           {
-            name: "Corte + barba",
-            category: "Corte",
+            name: "Sesión Especializada / Terapia",
+            category: "Salud & Bienestar",
+            durationMin: 50,
+            price: 35000,
+            description: "Sesión completa de tratamiento o terapia especializada.",
+            active: true,
+          },
+          {
+            name: "Teleatención Online",
+            category: "Salud & Bienestar",
+            durationMin: 30,
+            price: 20000,
+            description: "Videoconsulta remota con envío de pautas y recetas digitales.",
+            active: true,
+          },
+          {
+            name: "Asesoría Profesional / Consultoría",
+            category: "Asesoría & Negocios",
             durationMin: 45,
-            price: 12000,
-            description: "Corte y perfilado de barba",
+            price: 40000,
+            description: "Sesión de diagnóstico y asesoría estratégica personalizada.",
             active: true,
           },
           {
-            name: "Afeitado clásico",
-            category: "Barba",
+            name: "Reunión de Seguimiento de Proyecto",
+            category: "Asesoría & Negocios",
             durationMin: 30,
-            price: 9000,
-            description: "Afeitado con toalla caliente",
-            active: true,
-          },
-          {
-            name: "Perfilado de barba",
-            category: "Barba",
-            durationMin: 20,
-            price: 7000,
-            description: "Perfilado y arreglo",
+            price: 25000,
+            description: "Revisión de avances, entregables y próximos pasos de trabajo.",
             active: true,
           },
         ],
@@ -69,6 +78,8 @@ async function main() {
     update: { shopId: shop.id, passwordHash },
     create: { email: adminEmail, passwordHash, shopId: shop.id },
   });
+  
+  console.log("Seed completado para Enlace Agenda Pro:", shop.slug);
 }
 
 main()
@@ -76,7 +87,7 @@ main()
     await prisma.$disconnect();
   })
   .catch(async (e) => {
+    console.error(e);
     await prisma.$disconnect();
     throw e;
   });
-

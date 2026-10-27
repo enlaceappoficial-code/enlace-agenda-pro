@@ -3,27 +3,24 @@ import { useNavigate, useOutletContext } from 'react-router-dom'
 import ThemeSelectorModal from '../../components/ThemeSelectorModal'
 import { apiPatch } from '../../lib/api'
 
-const SLUG = import.meta.env.VITE_APP_SLUG || 'peluqueria'
-const APP_LABEL = {
-  peluqueria: 'Barbería', bienestar: 'Bienestar',
-  mascotas: 'Mascotas', agenda_pro: 'Agenda Pro',
-}[SLUG] || 'Barbería'
+const SLUG = import.meta.env.VITE_APP_SLUG || 'agenda_pro'
+const APP_LABEL = 'Agenda Pro'
 
 const MENU_GROUPS = [
   {
-    group: 'Negocio',
+    group: 'Negocio & Atención',
     items: [
-      { title: 'Link de Reservas', sub: 'Comparte y tus clientes agendan solos', icon: '🔗', to: '/admin/booking-link', highlight: true },
-      { title: 'Gestión de Servicios', sub: 'Precios, duraciones y costos', icon: '✂️', to: '/admin/services' },
-      { title: 'Profesionales', sub: 'Gestiona tu equipo y sus agendas', icon: '👥', to: '/admin/professionals' },
-      { title: 'Galería de Trabajos', sub: 'Sube fotos de tus mejores trabajos', icon: '🖼️', to: '/admin/gallery' },
+      { title: 'Link de Reservas', sub: 'Comparte y tus clientes/pacientes agendan solos', icon: '🔗', to: '/admin/booking-link', highlight: true },
+      { title: 'Servicios & Atenciones', sub: 'Precios, duraciones y modalidades', icon: '📋', to: '/admin/services' },
+      { title: 'Profesionales / Especialistas', sub: 'Gestiona tu equipo y sus agendas', icon: '👥', to: '/admin/professionals' },
+      { title: 'Instalaciones & Fotos', sub: 'Muestra tus espacios y consultorios', icon: '🖼️', to: '/admin/gallery' },
     ]
   },
   {
     group: 'Finanzas',
     items: [
       { title: 'Estadísticas', sub: 'Reportes mensuales y análisis', icon: '📊', to: '/admin/estadisticas' },
-      { title: 'Gastos Fijos', sub: 'Arriendo, luz y otros costos', icon: '🏢', to: '/admin/gastos-fijos' },
+      { title: 'Gastos Fijos', sub: 'Arriendo, suministros y costos operativos', icon: '🏢', to: '/admin/gastos-fijos' },
       { title: 'Mi Plan y Suscripción', sub: 'Gestiona tu plan Starter, Pro o Premium', icon: '💳', to: '/admin/planes' },
     ]
   },
@@ -43,17 +40,17 @@ export default function More() {
   const [showThemeModal, setShowThemeModal] = useState(false)
   const [savingType, setSavingType] = useState(false)
   const [toastMsg, setToastMsg] = useState('')
-  const effectiveType = shop?.businessType || localStorage.getItem('enlace_business_type') || 'barberia'
-  const isPeluqueria = effectiveType === 'peluqueria'
-  const currentAppLabel = isPeluqueria ? 'Peluquería' : APP_LABEL
+  const effectiveType = shop?.businessType || localStorage.getItem('enlace_business_type') || 'salud'
+  const isAsesoria = effectiveType === 'asesoria'
+  const currentAppLabel = isAsesoria ? 'Asesoría Pro' : 'Salud Pro'
 
   const handleToggleBusinessType = async (newType) => {
     if (effectiveType === newType || savingType) return
-    const nextType = newType === 'peluqueria' ? 'peluqueria' : 'barberia'
+    const nextType = newType === 'asesoria' ? 'asesoria' : 'salud'
     localStorage.setItem('enlace_business_type', nextType)
     if (setShop) setShop(prev => ({ ...(prev || {}), businessType: nextType }))
     window.dispatchEvent(new CustomEvent('enlace:businessType', { detail: nextType }))
-    setToastMsg(nextType === 'peluqueria' ? '✨ Modo Peluquería Pro activado' : '💈 Modo Barbería Pro activado')
+    setToastMsg(nextType === 'asesoria' ? '💼 Modo Asesoría & Consultoría activado' : '🩺 Modo Salud & Consulta Médica activado')
     setTimeout(() => setToastMsg(''), 3000)
 
     setSavingType(true)
@@ -79,11 +76,11 @@ export default function More() {
           Configuración
         </h1>
         <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 3, fontWeight: 500 }}>
-          Herramientas avanzadas de tu negocio
+          Herramientas avanzadas de tu agenda
         </p>
       </div>
 
-      {/* SWITCH RÁPIDO IDENTIDAD BARBERÍA / PELUQUERÍA */}
+      {/* SWITCH RÁPIDO IDENTIDAD SALUD / ASESORÍA */}
       <div style={{
         background: 'var(--card)',
         border: '1.5px solid var(--accent)',
@@ -103,7 +100,7 @@ export default function More() {
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
             }}>
-              Identidad de la Aplicación
+              Especialidad de la Agenda
             </div>
             <div style={{
               fontSize: 16,
@@ -114,8 +111,8 @@ export default function More() {
               gap: 6,
               marginTop: 2,
             }}>
-              <span>{isPeluqueria ? '💇‍♀️' : '💈'}</span>
-              <span>{isPeluqueria ? 'Peluquería PRO' : 'Barbería PRO'}</span>
+              <span>{isAsesoria ? '💼' : '🩺'}</span>
+              <span>{isAsesoria ? 'Asesoría & Consultoría' : 'Salud & Consulta Médica'}</span>
             </div>
           </div>
 
@@ -131,11 +128,11 @@ export default function More() {
             <button
               type="button"
               disabled={savingType}
-              onClick={() => handleToggleBusinessType('barberia')}
+              onClick={() => handleToggleBusinessType('salud')}
               style={{
                 border: 'none',
-                background: !isPeluqueria ? 'var(--accent)' : 'transparent',
-                color: !isPeluqueria ? '#ffffff' : 'var(--text-muted)',
+                background: !isAsesoria ? 'var(--accent)' : 'transparent',
+                color: !isAsesoria ? '#ffffff' : 'var(--text-muted)',
                 padding: '8px 14px',
                 borderRadius: 20,
                 fontSize: 12,
@@ -145,16 +142,16 @@ export default function More() {
                 transition: 'all 0.2s ease',
               }}
             >
-              <span>💈</span> Barbería Pro
+              <span>🩺</span> Salud
             </button>
             <button
               type="button"
               disabled={savingType}
-              onClick={() => handleToggleBusinessType('peluqueria')}
+              onClick={() => handleToggleBusinessType('asesoria')}
               style={{
                 border: 'none',
-                background: isPeluqueria ? 'var(--accent)' : 'transparent',
-                color: isPeluqueria ? '#ffffff' : 'var(--text-muted)',
+                background: isAsesoria ? 'var(--accent)' : 'transparent',
+                color: isAsesoria ? '#ffffff' : 'var(--text-muted)',
                 padding: '8px 14px',
                 borderRadius: 20,
                 fontSize: 12,
@@ -164,7 +161,7 @@ export default function More() {
                 transition: 'all 0.2s ease',
               }}
             >
-              <span>💇‍♀️</span> Peluquería Pro
+              <span>💼</span> Asesoría
             </button>
           </div>
         </div>

@@ -72,7 +72,7 @@ export default function Agenda() {
     
     // Validaciones locales amigables y de alta fidelidad:
     if (!formData.serviceId) {
-      setFormError('💈 Por favor, selecciona un servicio para continuar. ✂️')
+      setFormError('Por favor, selecciona un servicio o atención para continuar.')
       return
     }
     if (!formData.time) {
@@ -81,11 +81,11 @@ export default function Agenda() {
     }
     if (!formData.clientId) {
       if (!formData.guestName || !formData.guestName.trim()) {
-        setFormError('👤 Por favor, ingresa el nombre del nuevo cliente.')
+        setFormError('👤 Por favor, ingresa el nombre de la persona.')
         return
       }
       if (!formData.guestPhone || !formData.guestPhone.trim()) {
-        setFormError('📱 Por favor, ingresa el número de WhatsApp del cliente para enviarle las confirmaciones.')
+        setFormError('📱 Por favor, ingresa el número de WhatsApp para enviarle las confirmaciones.')
         return
       }
     }
@@ -105,7 +105,7 @@ export default function Agenda() {
         if (phone && clientName) {
           const sendWA = confirm(`✅ Cita creada!\n\n¿Enviar confirmación por WhatsApp a ${clientName}?`)
           if (sendWA) {
-            const msg = encodeURIComponent(`Hola ${clientName.split(' ')[0]}! ✅ Tu cita está confirmada:\n\n💈 ${serviceName}\n📅 ${dateLabel}\n⏰ ${formData.time} hrs\n\n¡Te esperamos!`)
+            const msg = encodeURIComponent(`Hola ${clientName.split(' ')[0]}! ✅ Tu cita está confirmada:\n\n📋 ${serviceName}\n📅 ${dateLabel}\n⏰ ${formData.time} hrs\n\n¡Te esperamos!`)
             window.open(`https://wa.me/${phone.replace(/\D/g,'')}?text=${msg}`, '_blank')
           }
         }
@@ -115,7 +115,7 @@ export default function Agenda() {
       fetchData()
     } catch (e) {
       if (e.message === 'SLOT_TAKEN' || e.error === 'SLOT_TAKEN' || e.data?.error === 'SLOT_TAKEN') {
-        setFormError('💈 ¡Upa! Ese horario ya está tomado por otra reserva. Por favor elige otra hora. ✂️')
+        setFormError('⏰ Ese horario ya está tomado por otra reserva. Por favor elige otra hora.')
       } else {
         alert('Ocurrió un inconveniente al guardar. Por favor intenta nuevamente.')
       }
@@ -428,7 +428,7 @@ export default function Agenda() {
                   <div style={{ fontSize: 15, fontWeight: 700 }}>{a.guestName || a.client?.fullName}</div>
                   <div style={{ fontSize: 12, color: 'var(--muted)' }}>{a.service?.name}</div>
                   {a.client?.colorFormula && (
-                    <div style={{ fontSize: 10, fontWeight: 700, color: '#ea580c', marginTop: 2 }}>🎨 {a.client.colorFormula}</div>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--accent)', marginTop: 2 }}>📋 {a.client.colorFormula}</div>
                   )}
                 </div>
                 <div style={{ textAlign: 'right' }}>

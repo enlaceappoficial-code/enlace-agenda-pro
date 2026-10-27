@@ -21,7 +21,7 @@ export default function Configuracion() {
     barberBankRut: '',
     barberBankOwnerName: '',
     barberBankEmail: '',
-    businessType: 'barberia'
+    businessType: 'salud'
   })
   const [loading, setLoading] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -43,19 +43,19 @@ export default function Configuracion() {
         barberBankRut: shop.barberBankRut || '',
         barberBankOwnerName: shop.barberBankOwnerName || '',
         barberBankEmail: shop.barberBankEmail || '',
-        businessType: shop.businessType || localStorage.getItem('enlace_business_type') || 'barberia'
+        businessType: shop.businessType || localStorage.getItem('enlace_business_type') || 'salud'
       })
     }
   }, [shop])
 
   const handleBusinessTypeSwitch = async (newType) => {
     if (form.businessType === newType || typeSaving) return
-    const nextType = newType === 'peluqueria' ? 'peluqueria' : 'barberia'
+    const nextType = newType === 'asesoria' ? 'asesoria' : 'salud'
     localStorage.setItem('enlace_business_type', nextType)
     setForm(prev => ({ ...prev, businessType: nextType }))
     if (setShop) setShop(prev => ({ ...(prev || {}), businessType: nextType }))
     window.dispatchEvent(new CustomEvent('enlace:businessType', { detail: nextType }))
-    setTypeToast(nextType === 'peluqueria' ? '✨ ¡Listo! La app ahora es Peluquería Pro' : '💈 ¡Listo! La app ahora es Barbería Pro')
+    setTypeToast(nextType === 'asesoria' ? '💼 ¡Listo! La app ahora está configurada en Asesoría & Consultoría' : '🩺 ¡Listo! La app ahora está configurada en Salud & Consulta Médica')
     setTimeout(() => setTypeToast(''), 3500)
 
     setTypeSaving(true)
@@ -163,7 +163,7 @@ export default function Configuracion() {
         </p>
       </div>
 
-      {/* SECTION: SWITCH RÁPIDO IDENTIDAD BARBERÍA / PELUQUERÍA */}
+      {/* SECTION: SWITCH RÁPIDO IDENTIDAD SALUD / ASESORÍA */}
       <div style={{
         background: 'var(--card)',
         padding: '20px 24px',
@@ -185,14 +185,14 @@ export default function Configuracion() {
               textTransform: 'uppercase',
               marginBottom: 4,
             }}>
-              MODO / GIRO DE LA APLICACIÓN
+              MODO / ESPECIALIDAD DE LA AGENDA
             </div>
             <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span>{form.businessType === 'peluqueria' ? '💇‍♀️' : '💈'}</span>
-              <span>{form.businessType === 'peluqueria' ? 'PELUQUERÍA PRO' : 'BARBERÍA PRO'}</span>
+              <span>{form.businessType === 'asesoria' ? '💼' : '🩺'}</span>
+              <span>{form.businessType === 'asesoria' ? 'ASESORÍA & CONSULTORÍA' : 'SALUD & CONSULTA MÉDICA'}</span>
             </div>
             <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>
-              Toca el botón para cambiar el nombre y giro de tu app en tiempo real.
+              Toca el botón para cambiar el modo de la agenda y vocabulario en tiempo real.
             </div>
           </div>
 
@@ -209,11 +209,11 @@ export default function Configuracion() {
             <button
               type="button"
               disabled={typeSaving}
-              onClick={() => handleBusinessTypeSwitch('barberia')}
+              onClick={() => handleBusinessTypeSwitch('salud')}
               style={{
                 border: 'none',
-                background: form.businessType === 'barberia' ? 'var(--accent)' : 'transparent',
-                color: form.businessType === 'barberia' ? '#ffffff' : 'var(--text-muted)',
+                background: form.businessType === 'salud' ? 'var(--accent)' : 'transparent',
+                color: form.businessType === 'salud' ? '#ffffff' : 'var(--text-muted)',
                 padding: '10px 20px',
                 borderRadius: 24,
                 fontSize: 13,
@@ -222,21 +222,21 @@ export default function Configuracion() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 8,
-                boxShadow: form.businessType === 'barberia' ? '0 4px 15px rgba(245,160,32,0.4)' : 'none',
+                boxShadow: form.businessType === 'salud' ? '0 4px 15px rgba(14,165,233,0.4)' : 'none',
                 transition: 'all 0.25s ease',
               }}
             >
-              <span style={{ fontSize: 16 }}>💈</span> Barbería Pro
+              <span style={{ fontSize: 16 }}>🩺</span> Salud / Consulta
             </button>
 
             <button
               type="button"
               disabled={typeSaving}
-              onClick={() => handleBusinessTypeSwitch('peluqueria')}
+              onClick={() => handleBusinessTypeSwitch('asesoria')}
               style={{
                 border: 'none',
-                background: form.businessType === 'peluqueria' ? 'var(--accent)' : 'transparent',
-                color: form.businessType === 'peluqueria' ? '#ffffff' : 'var(--text-muted)',
+                background: form.businessType === 'asesoria' ? 'var(--accent)' : 'transparent',
+                color: form.businessType === 'asesoria' ? '#ffffff' : 'var(--text-muted)',
                 padding: '10px 20px',
                 borderRadius: 24,
                 fontSize: 13,
@@ -245,11 +245,11 @@ export default function Configuracion() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 8,
-                boxShadow: form.businessType === 'peluqueria' ? '0 4px 15px rgba(236,72,153,0.4)' : 'none',
+                boxShadow: form.businessType === 'asesoria' ? '0 4px 15px rgba(99,102,241,0.4)' : 'none',
                 transition: 'all 0.25s ease',
               }}
             >
-              <span style={{ fontSize: 16 }}>💇‍♀️</span> Peluquería Pro
+              <span style={{ fontSize: 16 }}>💼</span> Asesoría / Servicios
             </button>
           </div>
         </div>
@@ -414,29 +414,29 @@ export default function Configuracion() {
 
         <div>
           <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', display: 'block', marginBottom: 8 }}>
-            TIPO DE NEGOCIO (IDENTIDAD DE LA APP)
+            ESPECIALIDAD / ÁREA DE LA AGENDA
           </label>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 12 }}>
             <div
-              onClick={() => handleBusinessTypeSwitch('barberia')}
+              onClick={() => handleBusinessTypeSwitch('salud')}
               style={{
                 padding: '14px 16px',
                 borderRadius: 14,
                 cursor: 'pointer',
-                border: form.businessType === 'barberia' ? '2px solid var(--accent)' : '1px solid var(--border)',
-                background: form.businessType === 'barberia' ? 'var(--primary-subtle)' : 'var(--bg)',
+                border: form.businessType === 'salud' ? '2px solid var(--accent)' : '1px solid var(--border)',
+                background: form.businessType === 'salud' ? 'var(--primary-subtle)' : 'var(--bg)',
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 transition: 'all 0.2s ease',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ fontSize: 26 }}>💈</span>
+                <span style={{ fontSize: 26 }}>🩺</span>
                 <div>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-main)' }}>Barbería</div>
-                  <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Cortes y barbas</div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-main)' }}>Salud & Consulta</div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Médicos, psicólogos, clínicas</div>
                 </div>
               </div>
-              {form.businessType === 'barberia' && (
+              {form.businessType === 'salud' && (
                 <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--accent)', background: 'var(--bg)', padding: '2px 8px', borderRadius: 12, border: '1px solid var(--accent)' }}>
                   ✓ ACTIVO
                 </span>
@@ -444,25 +444,25 @@ export default function Configuracion() {
             </div>
 
             <div
-              onClick={() => handleBusinessTypeSwitch('peluqueria')}
+              onClick={() => handleBusinessTypeSwitch('asesoria')}
               style={{
                 padding: '14px 16px',
                 borderRadius: 14,
                 cursor: 'pointer',
-                border: form.businessType === 'peluqueria' ? '2px solid var(--accent)' : '1px solid var(--border)',
-                background: form.businessType === 'peluqueria' ? 'var(--primary-subtle)' : 'var(--bg)',
+                border: form.businessType === 'asesoria' ? '2px solid var(--accent)' : '1px solid var(--border)',
+                background: form.businessType === 'asesoria' ? 'var(--primary-subtle)' : 'var(--bg)',
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 transition: 'all 0.2s ease',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ fontSize: 26 }}>💇‍♀️</span>
+                <span style={{ fontSize: 26 }}>💼</span>
                 <div>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-main)' }}>Peluquería</div>
-                  <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Salón, color y estilo</div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-main)' }}>Asesoría & Servicios</div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Consultores, abogados, empresas</div>
                 </div>
               </div>
-              {form.businessType === 'peluqueria' && (
+              {form.businessType === 'asesoria' && (
                 <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--accent)', background: 'var(--bg)', padding: '2px 8px', borderRadius: 12, border: '1px solid var(--accent)' }}>
                   ✓ ACTIVO
                 </span>
@@ -472,9 +472,9 @@ export default function Configuracion() {
         </div>
 
         <div>
-          <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', display: 'block', marginBottom: 6 }}>NOMBRE PÚBLICO DEL NEGOCIO *</label>
+          <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', display: 'block', marginBottom: 6 }}>NOMBRE PÚBLICO DEL NEGOCIO / CENTRO *</label>
           <input 
-            placeholder="Ej: Barbería Los Cracks" 
+            placeholder="Ej: Centro de Atención San Andrés o Consultora Enlace" 
             style={{ width: '100%', padding: 14, borderRadius: 12, border: '1px solid var(--border)', background: 'var(--bg)' }}
             value={form.name} 
             onChange={e => setForm({ ...form, name: e.target.value })}

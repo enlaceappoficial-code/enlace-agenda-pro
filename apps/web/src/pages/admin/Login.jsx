@@ -2,14 +2,14 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { apiPost } from '../../lib/api'
 
-const SLUG = import.meta.env.VITE_APP_SLUG || 'peluqueria'
+const SLUG = import.meta.env.VITE_APP_SLUG || 'agenda_pro'
 const THEME_CONFIG = {
   peluqueria: { label: 'BARBERÍA', sub: 'Panel de Administración', cta: 'Crea tu barbería gratis' },
   bienestar:  { label: 'BIENESTAR', sub: 'Panel de Administración', cta: 'Crea tu spa gratis' },
   mascotas:   { label: 'MASCOTAS', sub: 'Panel de Administración', cta: 'Crea tu centro gratis' },
-  agenda_pro: { label: 'AGENDA PRO', sub: 'Panel de Administración', cta: 'Crea tu cuenta gratis' },
+  agenda_pro: { label: 'AGENDA PRO', sub: 'Panel de Gestión y Citas', cta: 'Crea tu agenda gratis' },
 }
-const T = THEME_CONFIG[SLUG] || THEME_CONFIG.peluqueria
+const T = THEME_CONFIG[SLUG] || THEME_CONFIG.agenda_pro
 
 export default function AdminLogin() {
   const nav = useNavigate()

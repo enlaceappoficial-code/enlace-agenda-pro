@@ -71,7 +71,7 @@ export default function Booking() {
       nav(`/b/${slug}/confirm/${res.appointmentId}`)
     } catch (e) {
       if (e.data?.error === 'SLOT_TAKEN') {
-        alert('💈 ¡Upa! Al parecer este horario acaba de ser reservado por otro cliente. Por favor, selecciona una hora diferente para dejarte impecable. ✂️')
+        alert('📅 ¡Atención! Al parecer este horario acaba de ser reservado por otra persona. Por favor, selecciona un horario diferente para tu atención.')
       } else {
         alert('Ocurrió un inconveniente al procesar tu reserva. Por favor, intenta nuevamente.')
       }

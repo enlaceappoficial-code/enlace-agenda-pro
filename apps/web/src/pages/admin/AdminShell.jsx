@@ -95,9 +95,11 @@ export default function AdminShell() {
   }
 
   const handleDesktopTypeSwitch = async (newType) => {
-    const nextType = newType === 'profesional' ? 'profesional' : 'salud'
+    const nextType = newType === 'asesoria' || newType === 'profesional' ? 'asesoria' : 'salud'
+    localStorage.setItem('enlace_business_type', nextType)
     localStorage.setItem('enlace_agenda_mode', nextType)
     setShop(prev => ({ ...(prev || {}), businessType: nextType }))
+    window.dispatchEvent(new CustomEvent('enlace:businessType', { detail: nextType }))
     window.dispatchEvent(new CustomEvent('enlace:agendaMode', { detail: nextType }))
 
     try {
@@ -183,7 +185,7 @@ export default function AdminShell() {
             </button>
             <button
               type="button"
-              onClick={() => handleDesktopTypeSwitch('profesional')}
+              onClick={() => handleDesktopTypeSwitch('asesoria')}
               style={{
                 flex: 1, border: 'none',
                 background: !isHealth ? 'var(--accent)' : 'transparent',

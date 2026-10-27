@@ -4,9 +4,10 @@ import { apiGet, apiPost, apiPatch, apiDelete } from '../../lib/api'
 
 export default function Professionals() {
   const { shop } = useOutletContext()
-  const isPeluqueria = shop?.businessType === 'peluqueria'
-  const defaultRole = isPeluqueria ? 'Estilista' : 'Barbero'
-  const teamPlural = isPeluqueria ? 'estilistas' : 'barberos'
+  const effectiveType = shop?.businessType || localStorage.getItem('enlace_business_type') || 'salud'
+  const isAsesoria = effectiveType === 'asesoria'
+  const defaultRole = isAsesoria ? 'Consultor / Asesor' : 'Especialista / Médico'
+  const teamPlural = isAsesoria ? 'consultores y profesionales' : 'especialistas y profesionales'
   const nav = useNavigate()
   const [professionals, setProfessionals] = useState([])
   const [loading, setLoading] = useState(true)
@@ -27,7 +28,7 @@ export default function Professionals() {
 
   const handleSave = async () => {
     if (!form.name || !form.name.trim()) {
-      alert('👤 ¡Opa! Por favor, ingresa el nombre del profesional para continuar.')
+      alert('👤 Por favor, ingresa el nombre del profesional para continuar.')
       return
     }
 
@@ -43,7 +44,7 @@ export default function Professionals() {
       load()
     } catch (e) { 
       console.error(e)
-      alert(e.data?.error || '💈 ¡Ups! Tuvimos un inconveniente al guardar el profesional. Inténtalo nuevamente.') 
+      alert(e.data?.error || 'Tuvimos un inconveniente al guardar el profesional. Inténtalo nuevamente.') 
     }
   }
 
@@ -53,7 +54,7 @@ export default function Professionals() {
       await apiDelete(`/api/professionals/${id}`)
       load()
     } catch (e) { 
-      alert('💈 ¡Ups! No pudimos desactivar al profesional. Por favor, intenta de nuevo.') 
+      alert('No pudimos desactivar al profesional. Por favor, intenta de nuevo.') 
     }
   }
 
@@ -241,18 +242,18 @@ export default function Professionals() {
               </div>
 
               <div>
-                <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', display: 'block', marginBottom: 4 }}>NOMBRE</label>
+                <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', display: 'block', marginBottom: 4 }}>NOMBRE COMPLETO</label>
                 <input 
-                  placeholder={isPeluqueria ? "Ej: Francisca Silva" : "Ej: Alexis Sánchez"}
+                  placeholder={isAsesoria ? "Ej: Lic. Claudia Morales o Ing. Roberto Gómez" : "Ej: Dra. Valeria Soto o Lic. Matías Morales"}
                   style={{ width: '100%', padding: 14, borderRadius: 12, border: '1px solid var(--border)', background: 'var(--bg)' }}
                   value={form.name} onChange={e => setForm({ ...form, name: e.target.value })}
                 />
               </div>
 
               <div>
-                <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', display: 'block', marginBottom: 4 }}>CARGO / TÍTULO</label>
+                <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', display: 'block', marginBottom: 4 }}>ESPECIALIDAD / CARGO</label>
                 <input 
-                  placeholder={isPeluqueria ? "Ej: Master Estilista, Colorista..." : "Ej: Master Barber, Barbero..."}
+                  placeholder={isAsesoria ? "Ej: Consultor Tributario, Abogado, Asesor Financiero..." : "Ej: Médico General, Psicólogo Clínico, Kinesiólogo..."}
                   style={{ width: '100%', padding: 14, borderRadius: 12, border: '1px solid var(--border)', background: 'var(--bg)' }}
                   value={form.title} onChange={e => setForm({ ...form, title: e.target.value })}
                 />

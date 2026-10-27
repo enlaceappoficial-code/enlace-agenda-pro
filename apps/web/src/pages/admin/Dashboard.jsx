@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useOutletContext } from 'react-router-dom'
 import { apiGet } from '../../lib/api'
 
-const SLUG = import.meta.env.VITE_APP_SLUG || 'peluqueria'
+const SLUG = import.meta.env.VITE_APP_SLUG || 'agenda_pro'
 
 export default function Dashboard() {
   const { shop } = useOutletContext()

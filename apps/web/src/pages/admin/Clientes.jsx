@@ -4,10 +4,13 @@ import { apiGet, apiPost, apiPatch, apiDelete } from '../../lib/api'
 
 export default function Clientes() {
   const { shop } = useOutletContext() || {}
-  const isPeluqueria = shop?.businessType === 'peluqueria'
-  const businessName = isPeluqueria ? 'la peluquería' : 'la barbería'
-  const emoji = isPeluqueria ? '💇‍♀️' : '💈'
-  const serviceWord = isPeluqueria ? 'tu próxima cita' : 'tu próximo corte'
+  const effectiveType = shop?.businessType || localStorage.getItem('enlace_business_type') || 'salud'
+  const isAsesoria = effectiveType === 'asesoria'
+  const clientWord = isAsesoria ? 'Cliente' : 'Paciente'
+  const clientPlural = isAsesoria ? 'Clientes' : 'Pacientes'
+  const businessName = isAsesoria ? 'el centro de asesoría' : 'la consulta médica'
+  const emoji = isAsesoria ? '💼' : '🩺'
+  const serviceWord = isAsesoria ? 'tu próxima sesión' : 'tu próxima consulta'
 
   const [view, setView] = useState('lista')
   const [clients, setClients] = useState([])
@@ -243,8 +246,10 @@ export default function Clientes() {
         )}
 
         {selectedClient.colorFormula && (
-          <div style={{ background: '#fff7ed', border: '1px solid #fdba74', padding: 16, borderRadius: 12 }}>
-            <div style={{ fontWeight: 800, fontSize: 13, color: '#9a3412', marginBottom: 4 }}>🎨 FÓRMULA DE COLOR</div>
+          <div style={{ background: isAsesoria ? '#eff6ff' : '#f0fdf4', border: `1px solid ${isAsesoria ? '#93c5fd' : '#86efac'}`, padding: 16, borderRadius: 12 }}>
+            <div style={{ fontWeight: 800, fontSize: 13, color: isAsesoria ? '#1e40af' : '#166534', marginBottom: 4 }}>
+              {isAsesoria ? '💼 EXPEDIENTE / CASO' : '🩺 FICHA / ANTECEDENTES CLÍNICOS'}
+            </div>
             <div style={{ fontSize: 14 }}>{selectedClient.colorFormula}</div>
           </div>
         )}
@@ -268,9 +273,9 @@ export default function Clientes() {
 
         {/* HISTORIAL */}
         <div>
-          <h3 style={{ fontSize: 16, fontWeight: 800, marginBottom: 12 }}>Historial de Citas</h3>
+          <h3 style={{ fontSize: 16, fontWeight: 800, marginBottom: 12 }}>Historial de Atenciones</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {apps.length === 0 ? <div style={{ textAlign: 'center', color: 'var(--muted)', fontSize: 13 }}>Sin citas registradas</div> :
+            {apps.length === 0 ? <div style={{ textAlign: 'center', color: 'var(--muted)', fontSize: 13 }}>Sin atenciones registradas</div> :
             apps.map(a => (
               <div key={a.id} style={{ background: 'var(--card)', padding: 12, borderRadius: 12, border: '0.5px solid var(--border)', display: 'flex', justifyContent: 'space-between' }}>
                 <div>
@@ -294,11 +299,11 @@ export default function Clientes() {
   // VISTA EDITAR
   return (
     <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <h2 style={{ fontWeight: 800 }}>{selectedClient ? 'Editar Cliente' : 'Nuevo Cliente'}</h2>
+      <h2 style={{ fontWeight: 800 }}>{selectedClient ? `Editar ${clientWord}` : `Nuevo ${clientWord}`}</h2>
       
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <input placeholder="Nombre completo" style={{ padding: 14, borderRadius: 12, border: '1px solid var(--border)' }} value={formData.fullName} onChange={e => setFormData({ ...formData, fullName: e.target.value })} />
-        <input placeholder="Teléfono" style={{ padding: 14, borderRadius: 12, border: '1px solid var(--border)' }} value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} />
+        <input placeholder={`Nombre completo del ${clientWord.toLowerCase()} *`} style={{ padding: 14, borderRadius: 12, border: '1px solid var(--border)' }} value={formData.fullName} onChange={e => setFormData({ ...formData, fullName: e.target.value })} />
+        <input placeholder="WhatsApp (ej: 56912345678) *" style={{ padding: 14, borderRadius: 12, border: '1px solid var(--border)' }} value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} />
         <input placeholder="Email (opcional)" style={{ padding: 14, borderRadius: 12, border: '1px solid var(--border)' }} value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} />
         
         <label style={{ fontSize: 12, fontWeight: 700 }}>Categoría</label>
@@ -308,13 +313,20 @@ export default function Clientes() {
           ))}
         </div>
 
-        <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--orange)' }}>🎨 Fórmula de Color</label>
-        <textarea placeholder="Ej: Tinte 7.3 + oxidante 20vol, 40min" style={{ padding: 14, borderRadius: 12, border: '1px solid var(--orange)', background: 'var(--card)', minHeight: 80, color: 'var(--text)' }} value={formData.colorFormula} onChange={e => setFormData({ ...formData, colorFormula: e.target.value })} />
-        <textarea placeholder="Notas adicionales..." style={{ padding: 14, borderRadius: 12, border: '1px solid var(--border)', minHeight: 60 }} value={formData.notes} onChange={e => setFormData({ ...formData, notes: e.target.value })} />
+        <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent)' }}>
+          {isAsesoria ? '💼 Expediente / Antecedentes del Caso' : '🩺 Ficha Clínica / Antecedentes Médicos'}
+        </label>
+        <textarea 
+          placeholder={isAsesoria ? "Ej: Empresa SpA, caso civil en tramitación, contrato de prestación..." : "Ej: Alergia a penicilina, tratamiento crónico, diagnósticos previos..."} 
+          style={{ padding: 14, borderRadius: 12, border: '1px solid var(--accent)', background: 'var(--card)', minHeight: 80, color: 'var(--text)' }} 
+          value={formData.colorFormula} 
+          onChange={e => setFormData({ ...formData, colorFormula: e.target.value })} 
+        />
+        <textarea placeholder="Notas adicionales o seguimiento..." style={{ padding: 14, borderRadius: 12, border: '1px solid var(--border)', minHeight: 60 }} value={formData.notes} onChange={e => setFormData({ ...formData, notes: e.target.value })} />
 
         <button onClick={handleSave} style={{ padding: 16, borderRadius: 14, border: 'none', background: 'var(--accent)', color: 'white', fontWeight: 800, marginTop: 10 }}>Guardar Cambios</button>
         {selectedClient && (
-          <button onClick={handleDelete} style={{ padding: 14, borderRadius: 14, border: 'none', background: 'rgba(255, 59, 59, 0.1)', color: 'var(--red)', fontWeight: 700 }}>Eliminar Cliente</button>
+          <button onClick={handleDelete} style={{ padding: 14, borderRadius: 14, border: 'none', background: 'rgba(255, 59, 59, 0.1)', color: 'var(--red)', fontWeight: 700 }}>Eliminar {clientWord}</button>
         )}
         <button onClick={() => setView(selectedClient ? 'ficha' : 'lista')} style={{ padding: 14, borderRadius: 14, border: 'none', background: 'var(--btn-secondary)', color: 'var(--btn-secondary-text)', fontWeight: 700 }}>Cancelar</button>
       </div>

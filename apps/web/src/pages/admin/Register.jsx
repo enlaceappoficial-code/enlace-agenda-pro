@@ -2,18 +2,18 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { apiPost } from '../../lib/api'
 
-const SLUG = import.meta.env.VITE_APP_SLUG || 'peluqueria'
+const SLUG = import.meta.env.VITE_APP_SLUG || 'agenda_pro'
 const THEME_CONFIG = {
   peluqueria: { label: 'BARBERÍA', namePlaceholder: 'Ej: Kings Barber', slugPlaceholder: 'kings-barber', cta: 'Crear Barbería y Empezar' },
   bienestar:  { label: 'BIENESTAR', namePlaceholder: 'Ej: Zenith Spa', slugPlaceholder: 'zenith-spa', cta: 'Crear Spa y Empezar' },
   mascotas:   { label: 'MASCOTAS', namePlaceholder: 'Ej: Paws & Claws', slugPlaceholder: 'paws-claws', cta: 'Crear Centro y Empezar' },
-  agenda_pro: { label: 'AGENDA PRO', namePlaceholder: 'Ej: Dr. García Consultorios', slugPlaceholder: 'dr-garcia', cta: 'Crear Cuenta y Empezar' },
+  agenda_pro: { label: 'AGENDA PRO', namePlaceholder: 'Ej: Centro de Atención San Andrés', slugPlaceholder: 'san-andres', cta: 'Crear Agenda y Empezar' },
 }
-const T = THEME_CONFIG[SLUG] || THEME_CONFIG.peluqueria
+const T = THEME_CONFIG[SLUG] || THEME_CONFIG.agenda_pro
 
 export default function AdminRegister() {
   const nav = useNavigate()
-  const [businessType, setBusinessType] = useState('barberia')
+  const [businessType, setBusinessType] = useState('salud')
   const [shopName, setShopName] = useState('')
   const [slug, setSlug]         = useState('')
   const [email, setEmail]       = useState('')
@@ -127,42 +127,42 @@ export default function AdminRegister() {
         {/* ── FORM ── */}
         <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 13 }}>
 
-          {/* Selector de Tipo de Negocio */}
+          {/* Selector de Especialidad */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             <label style={{ fontSize: 10.5, fontWeight: 800, color: 'var(--text-muted)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-              ¿Qué tipo de negocio tienes?
+              ¿Cuál es tu especialidad o giro?
             </label>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
               <div
-                onClick={() => setBusinessType('barberia')}
+                onClick={() => setBusinessType('salud')}
                 style={{
                   padding: '10px 12px',
                   borderRadius: 'var(--radius-md)',
                   cursor: 'pointer',
-                  border: businessType === 'barberia' ? '2px solid var(--accent)' : '1px solid var(--border)',
-                  background: businessType === 'barberia' ? 'var(--primary-subtle)' : 'var(--card-bg-2, var(--bg))',
+                  border: businessType === 'salud' ? '2px solid var(--accent)' : '1px solid var(--border)',
+                  background: businessType === 'salud' ? 'var(--primary-subtle)' : 'var(--card-bg-2, var(--bg))',
                   display: 'flex', alignItems: 'center', gap: 8,
                   transition: 'var(--transition)',
                 }}
               >
-                <span style={{ fontSize: 18 }}>💈</span>
-                <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-main)' }}>Barbería</span>
+                <span style={{ fontSize: 18 }}>🩺</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-main)' }}>Salud / Médico</span>
               </div>
 
               <div
-                onClick={() => setBusinessType('peluqueria')}
+                onClick={() => setBusinessType('asesoria')}
                 style={{
                   padding: '10px 12px',
                   borderRadius: 'var(--radius-md)',
                   cursor: 'pointer',
-                  border: businessType === 'peluqueria' ? '2px solid var(--accent)' : '1px solid var(--border)',
-                  background: businessType === 'peluqueria' ? 'var(--primary-subtle)' : 'var(--card-bg-2, var(--bg))',
+                  border: businessType === 'asesoria' ? '2px solid var(--accent)' : '1px solid var(--border)',
+                  background: businessType === 'asesoria' ? 'var(--primary-subtle)' : 'var(--card-bg-2, var(--bg))',
                   display: 'flex', alignItems: 'center', gap: 8,
                   transition: 'var(--transition)',
                 }}
               >
-                <span style={{ fontSize: 18 }}>💇‍♀️</span>
-                <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-main)' }}>Peluquería</span>
+                <span style={{ fontSize: 18 }}>💼</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-main)' }}>Asesoría / Legal</span>
               </div>
             </div>
           </div>
@@ -170,10 +170,10 @@ export default function AdminRegister() {
           {/* Nombre */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
             <label style={{ fontSize: 10.5, fontWeight: 800, color: 'var(--text-muted)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-              Nombre del negocio
+              Nombre de tu centro o consulta
             </label>
             <input
-              placeholder={businessType === 'peluqueria' ? 'Ej: Peluquería Glamour' : 'Ej: Kings Barber'}
+              placeholder={businessType === 'asesoria' ? 'Ej: Consultora Legal & Tributaria' : 'Ej: Centro Médico San Andrés'}
               value={shopName} onChange={handleShopNameChange}
               style={inputStyle} onFocus={focusHandler} onBlur={blurHandler}
             />

@@ -9,7 +9,7 @@ export default function Services() {
   const [loading, setLoading] = useState(true)
   const [form, setForm] = useState({ 
     name: '', 
-    category: 'Corte', 
+    category: 'General', 
     durationMin: 30, 
     price: 0, 
     costMaterials: '', 
@@ -42,11 +42,11 @@ export default function Services() {
 
   const handleSave = async () => {
     if (!form.name || !form.name.trim()) {
-      alert('💈 ¡Opa! Por favor, ingresa el nombre del servicio (ej: Corte Degradado).')
+      alert('Por favor, ingresa el nombre de la atención o servicio (ej: Consulta General).')
       return
     }
     if (Number(form.price) < 0) {
-      alert('💰 El precio del servicio no puede ser menor a $0.')
+      alert('💰 El precio no puede ser menor a $0.')
       return
     }
 
@@ -66,7 +66,7 @@ export default function Services() {
 
       setForm({ 
         name: '', 
-        category: 'Corte', 
+        category: 'General', 
         durationMin: 30, 
         price: 0, 
         costMaterials: '', 
@@ -79,7 +79,7 @@ export default function Services() {
       setShowForm(false)
       load()
     } catch (e) { 
-      alert(e.data?.error || '💈 ¡Ups! Tuvimos un inconveniente al guardar el servicio. Inténtalo de nuevo.') 
+      alert(e.data?.error || 'Tuvimos un inconveniente al guardar el servicio. Inténtalo de nuevo.') 
     }
   }
 
@@ -88,7 +88,7 @@ export default function Services() {
       await apiPatch(`/api/services/${id}`, { active })
       setServices(prev => prev.map(s => s.id === id ? { ...s, active } : s))
     } catch (e) { 
-      alert('💈 ¡Ups! No pudimos cambiar el estado del servicio en este momento. Inténtalo nuevamente.') 
+      alert('No pudimos cambiar el estado del servicio en este momento. Inténtalo nuevamente.') 
     }
   }
 
@@ -114,12 +114,12 @@ export default function Services() {
     <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16, overflowY: 'auto', height: '100%', paddingBottom: 60 }}>
       
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2 style={{ fontSize: 20, fontWeight: 800 }}>Servicios</h2>
+        <h2 style={{ fontSize: 20, fontWeight: 800 }}>Servicios & Consultas</h2>
         <button 
           onClick={() => {
             setForm({ 
               name: '', 
-              category: 'Corte', 
+              category: 'General', 
               durationMin: 30, 
               price: 0, 
               costMaterials: '', 
@@ -203,17 +203,17 @@ export default function Services() {
             <h3 style={{ marginBottom: 16, fontWeight: 800 }}>{editingId ? 'Editar Servicio' : 'Nuevo Servicio'}</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div>
-                <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', display: 'block', marginBottom: 4 }}>NOMBRE</label>
+                <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', display: 'block', marginBottom: 4 }}>NOMBRE DE LA ATENCIÓN / SERVICIO</label>
                 <input 
-                  placeholder="Ej: Corte Degradado + Barba" 
+                  placeholder="Ej: Consulta Médica, Sesión Terapéutica o Asesoría" 
                   style={{ width: '100%', padding: 14, borderRadius: 12, border: '1px solid var(--border)', background: 'var(--bg)' }}
                   value={form.name} onChange={e => setForm({ ...form, name: e.target.value })}
                 />
               </div>
               <div>
-                <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', display: 'block', marginBottom: 4 }}>CATEGORÍA</label>
+                <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', display: 'block', marginBottom: 4 }}>CATEGORÍA / ESPECIALIDAD</label>
                 <input 
-                  placeholder="Ej: Corte, Barba, Color..." 
+                  placeholder="Ej: Salud, Psicología, Asesoría Legal, Diagnóstico..." 
                   style={{ width: '100%', padding: 14, borderRadius: 12, border: '1px solid var(--border)', background: 'var(--bg)' }}
                   value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}
                 />
