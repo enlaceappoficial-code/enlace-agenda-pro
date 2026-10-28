@@ -46,7 +46,8 @@ app.use(
     secret: process.env.SESSION_SECRET || "dev-session-secret",
     httpOnly: true,
     sameSite: process.env.COOKIE_SAMESITE || "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: process.env.NODE_ENV === "production" || process.env.COOKIE_SECURE === "true",
+    domain: process.env.COOKIE_DOMAIN || undefined,
   }),
 );
 
