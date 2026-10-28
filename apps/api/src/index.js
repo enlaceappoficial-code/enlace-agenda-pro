@@ -91,7 +91,7 @@ app.post(
         password: z.string().min(6),
         shopName: z.string().min(2),
         slug: z.string().min(2),
-        businessType: z.enum(['barberia', 'peluqueria']).optional().default('barberia')
+        businessType: z.string().optional().default('general')
       })
       .parse(req.body);
     
@@ -109,7 +109,7 @@ app.post(
         name: body.shopName,
         slug: body.slug,
         appId: "AGENDA_PRO",
-        businessType: body.businessType || "salud",
+        businessType: body.businessType || "general",
         planId: "PRO", // Comienzan con prueba de PRO
         subscriptionEndsAt: trialEndsAt,
       }
@@ -123,60 +123,39 @@ app.post(
       }
     });
 
-    // Precargar servicios de ejemplo según el tipo de negocio (Agenda Pro)
-    const sampleServices = body.businessType === 'profesional'
-      ? [
-          {
-            shopId: shop.id,
-            name: "Asesoría Inicial / Diagnóstico",
-            category: "Consultoría",
-            durationMin: 60,
-            price: 30000,
-            description: "Análisis del caso o requerimiento y propuesta de solución."
-          },
-          {
-            shopId: shop.id,
-            name: "Sesión de Trabajo Especializada",
-            category: "Consultoría",
-            durationMin: 45,
-            price: 25000,
-            description: "Reunión de trabajo y asesoría técnica directa."
-          },
-          {
-            shopId: shop.id,
-            name: "Reunión Virtual / Asesoría Online",
-            category: "Online",
-            durationMin: 30,
-            price: 15000,
-            description: "Sesión remota por videollamada (Meet / Zoom / WhatsApp)."
-          }
-        ]
-      : [
-          {
-            shopId: shop.id,
-            name: "Consulta General / Primera Sesión",
-            category: "Atención General",
-            durationMin: 50,
-            price: 25000,
-            description: "Evaluación inicial y definición de plan de atención."
-          },
-          {
-            shopId: shop.id,
-            name: "Sesión de Seguimiento / Control",
-            category: "Atención General",
-            durationMin: 45,
-            price: 20000,
-            description: "Revisión de avances y continuidad de tratamiento o sesión."
-          },
-          {
-            shopId: shop.id,
-            name: "Consulta Online / Teleatención",
-            category: "Online",
-            durationMin: 45,
-            price: 20000,
-            description: "Consulta remota vía videollamada."
-          }
-        ];
+    // Precargar servicios de ejemplo con las 3 modalidades principales (Presencial, Online, Encargo)
+    const sampleServices = [
+      {
+        shopId: shop.id,
+        name: "Atención Presencial / Primera Sesión",
+        category: "Presencial",
+        durationMin: 45,
+        price: 25000,
+        modality: "PRESENCIAL",
+        instructions: "Te esperamos en nuestras instalaciones. Llega con 5 minutos de anticipación.",
+        description: "Sesión personalizada de atención presencial o en terreno."
+      },
+      {
+        shopId: shop.id,
+        name: "Asesoría o Sesión Online (Meet / Zoom)",
+        category: "Online",
+        durationMin: 45,
+        price: 20000,
+        modality: "ONLINE",
+        instructions: "El enlace de videollamada te llegará a tu WhatsApp 15 minutos antes de la hora.",
+        description: "Reunión virtual remota para consultas, clases o asesorías."
+      },
+      {
+        shopId: shop.id,
+        name: "Pedido Personalizado por Encargo (Ej: Timbre o Producto)",
+        category: "Encargos",
+        durationMin: 15,
+        price: 14990,
+        modality: "ENCARGO",
+        instructions: "Indica en las notas el texto exacto, especificaciones y color. Retiro en 24 a 48 hrs.",
+        description: "Fabricación o preparación de encargo personalizado con retiro coordinado."
+      }
+    ];
 
     await prisma.service.createMany({
       data: sampleServices
