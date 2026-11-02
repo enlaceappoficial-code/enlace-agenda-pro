@@ -117,7 +117,8 @@ async function linkShop({ shopId, enlaceProfileId, code }) {
     data: {
       enlaceProfileId,
       enlaceTokenApp: data.token_app,
-      planId: "BASIC" // Automatically set plan to STARTER (BASIC) when linked!
+      planId: (data && (data.planId || data.plan) ? String(data.planId || data.plan).toUpperCase() : "BASIC"),
+      subscriptionEndsAt: data && data.subscriptionEndsAt ? new Date(data.subscriptionEndsAt) : new Date(Date.now() + 365 * 86400000)
     },
   });
 
