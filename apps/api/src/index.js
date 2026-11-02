@@ -30,6 +30,8 @@ const corsOptions = {
     if (!origin || origin === 'null') return cb(null, true);
     if (corsOrigins.length === 0) return cb(null, true);
     if (corsOrigins.includes(origin)) return cb(null, true);
+    if (/^https?:\/\/([a-zA-Z0-9-]+\.)*redenlace\.cl(:\d+)?$/i.test(origin)) return cb(null, true);
+    if (/^https?:\/\/localhost(:\d+)?$/i.test(origin)) return cb(null, true);
     return cb(null, false);
   },
   credentials: true,
@@ -45,9 +47,9 @@ app.use(
     name: "barber_session",
     secret: process.env.SESSION_SECRET || "dev-session-secret",
     httpOnly: true,
-    sameSite: process.env.COOKIE_SAMESITE || "lax",
+    sameSite: process.env.COOKIE_SAMESITE || ((process.env.NODE_ENV === "production" || process.env.COOKIE_SECURE === "true") ? "none" : "lax"),
     secure: process.env.NODE_ENV === "production" || process.env.COOKIE_SECURE === "true",
-    domain: process.env.COOKIE_DOMAIN || undefined,
+    domain: process.env.COOKIE_DOMAIN && !process.env.COOKIE_DOMAIN.includes("redenlace") ? process.env.COOKIE_DOMAIN : undefined,
   }),
 );
 
@@ -1741,8 +1743,9 @@ app.use((err, _req, res, _next) => {
 });
 
 const port = Number(process.env.PORT || 5184);
-app.listen(port, () => {
-  process.stdout.write(`Agenda Pro API listening on http://localhost:${port}\n`);
+const host = process.env.HOST || "0.0.0.0";
+app.listen(port, host, () => {
+  console.log(`Agenda Pro API listening on http://${host}:${port}`);
 });
 
 setInterval(() => {
