@@ -19,15 +19,153 @@
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
 
-    <!-- Registro del Service Worker para PWA -->
+    
+  
+    <!-- PWA FLOATING BANNER (ESTILO ARANPRO / ENLACE) -->
+    <style>
+      .pwa-floating-banner {
+        position: fixed;
+        bottom: 18px;
+        left: 14px;
+        right: 14px;
+        max-width: 600px;
+        margin: 0 auto;
+        background: linear-gradient(135deg, #071a3a 0%, #030d1d 100%);
+        border: 1px solid rgba(56, 189, 248, 0.35);
+        border-radius: 20px;
+        padding: 12px 16px;
+        display: none;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.65), 0 0 24px rgba(56, 189, 248, 0.15);
+        z-index: 999999;
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        animation: slideUpPwa 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      }
+      @keyframes slideUpPwa {
+        from { transform: translateY(80px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+      .pwa-banner-left { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+      .pwa-app-icon-wrap {
+        width: 44px; height: 44px; min-width: 44px; border-radius: 12px;
+        background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12);
+        display: flex; align-items: center; justify-content: center; overflow: hidden;
+      }
+      .pwa-app-icon { width: 34px; height: 34px; object-fit: contain; }
+      .pwa-banner-text { flex: 1; min-width: 0; }
+      .pwa-banner-title-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+      .pwa-banner-title { font-size: 13px; font-weight: 800; color: #ffffff; letter-spacing: -0.2px; }
+      .pwa-badge-rapido {
+        font-size: 10px; font-weight: 700; color: #38bdf8;
+        background: rgba(56, 189, 248, 0.16); border: 1px solid rgba(56, 189, 248, 0.35);
+        padding: 1px 7px; border-radius: 6px; text-transform: uppercase;
+      }
+      .pwa-banner-desc {
+        font-size: 11px; color: #94a3b8; margin-top: 3px; line-height: 1.35;
+        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+      }
+      .pwa-banner-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+      .pwa-btn-install {
+        display: inline-flex; align-items: center; gap: 6px;
+        background: transparent; color: #38bdf8; border: none;
+        font-size: 13px; font-weight: 800; padding: 8px 12px; cursor: pointer;
+        border-radius: 10px; transition: all 0.2s;
+      }
+      .pwa-btn-install:hover { background: rgba(56, 189, 248, 0.16); }
+      .pwa-btn-close {
+        background: transparent; border: none; color: #64748b; font-size: 16px;
+        cursor: pointer; padding: 6px; line-height: 1; display: flex; align-items: center; justify-content: center;
+      }
+      .pwa-btn-close:hover { color: #e2e8f0; }
+    </style>
+
+    <div id="pwaInstallBanner" class="pwa-floating-banner">
+      <div class="pwa-banner-left">
+        <div class="pwa-app-icon-wrap">
+          <img src="/logo-icon.png" alt="Agenda Pro" class="pwa-app-icon">
+        </div>
+        <div class="pwa-banner-text">
+          <div class="pwa-banner-title-row">
+            <span class="pwa-banner-title">Instalar App AGENDA PRO (PWA)</span>
+            <span class="pwa-badge-rapido">Rápido</span>
+          </div>
+          <p class="pwa-banner-desc">Accede a tus citas, reservas y clientes directo desde tu pantalla de inicio sin descargas pesadas.</p>
+        </div>
+      </div>
+      <div class="pwa-banner-actions">
+        <button class="pwa-btn-install" onclick="triggerPWAInstall()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>Instalar</span>
+        </button>
+        <button class="pwa-btn-close" onclick="dismissPWABanner()" title="Cerrar">✕</button>
+      </div>
+    </div>
+
     <script>
+      let deferredPrompt = null;
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        const banner = document.getElementById('pwaInstallBanner');
+        if (banner && sessionStorage.getItem('agenda_pwa_dismissed') !== '1') {
+          banner.style.display = 'flex';
+        }
+      });
+
+      window.addEventListener('appinstalled', () => {
+        const banner = document.getElementById('pwaInstallBanner');
+        if (banner) banner.style.display = 'none';
+      });
+
+      function dismissPWABanner() {
+        const banner = document.getElementById('pwaInstallBanner');
+        if (banner) banner.style.display = 'none';
+        sessionStorage.setItem('agenda_pwa_dismissed', '1');
+      }
+
+      function checkPWABanner() {
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+        if (isStandalone || sessionStorage.getItem('agenda_pwa_dismissed') === '1') return;
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth <= 768;
+        if (isMobile) {
+          const banner = document.getElementById('pwaInstallBanner');
+          if (banner) banner.style.display = 'flex';
+        }
+      }
+
+      function triggerPWAInstall() {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then((choice) => {
+            if (choice.outcome === 'accepted') {
+              const banner = document.getElementById('pwaInstallBanner');
+              if (banner) banner.style.display = 'none';
+            }
+            deferredPrompt = null;
+          });
+        } else {
+          const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+          if (isIOS) {
+            alert('📲 Para instalar Agenda Pro en iPhone:\n\n1. En Safari, toca el botón Compartir (el ícono 📤)\n2. Desliza y toca "Agregar a inicio" (o "Añadir a pantalla de inicio" ➕)\n3. Presiona "Agregar".\n\n¡Listo! Tendrás el icono en tu pantalla.');
+          } else {
+            alert('📲 Para instalar Agenda Pro en tu celular:\n\n1. Toca los tres puntos (⋮) en la esquina superior de Chrome.\n2. Selecciona "Instalar aplicación" o "Agregar a la pantalla principal".');
+          }
+        }
+      }
+
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('/sw.js')
             .then((reg) => console.log('Service Worker registrado con éxito:', reg.scope))
             .catch((err) => console.error('Error al registrar el Service Worker:', err));
+          checkPWABanner();
         });
       }
     </script>
-  </body>
+
+</body>
 </html>
